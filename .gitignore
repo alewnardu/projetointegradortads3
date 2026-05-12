@@ -1,4 +1,49 @@
+# Ambiente virtual
 venv/
-__pycache__/
-*.pyc
+
+# Variáveis de ambiente
 .env
+
+# Cache Python
+__pycache__/
+*.py[cod]
+
+# Arquivos compilados
+*.so
+
+# VSCode
+.vscode/
+
+# JetBrains
+.idea/
+
+# Logs
+*.log
+
+# Arquivos temporários
+*.tmp
+*.temp
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Pytest
+.pytest_cache/
+
+# Mypy
+.mypy_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Build
+build/
+dist/
+
+# SQLite
+*.sqlite3
+
+# Arquivos locais auxiliares
+estrutura.txt
