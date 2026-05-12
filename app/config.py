@@ -4,7 +4,7 @@ class Config:
     
     SQLALCHEMY_DATABASE_URI = os.getenv(
         'DATABASE_URL',
-        'mysql+pymysql://root:senha@localhost/brinquedoteca'
+        'mysql+pymysql://usuario:senha@localhost/brinquedoteca'
     )
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
