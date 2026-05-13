@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 class Config:
     
@@ -16,6 +17,8 @@ class Config:
     
     SECRET_KEY = os.getenv('SECRET_KEY') or 'secret'
     
-    PLOAD_FOLDER = 'uploads'
+    UPLOAD_FOLDER = 'uploads'
 
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024
+
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
