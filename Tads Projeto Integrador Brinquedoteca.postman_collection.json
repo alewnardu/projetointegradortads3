@@ -165,6 +165,47 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "/alterar-senha",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODcwNTI0NSwianRpIjoiZDRjMGI3MDgtZjJhYS00ZmNhLWE0YzEtMTM1NmVhYzZiOWVlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg3MDUyNDUsImNzcmYiOiJkMWZjZGJmYS0xZjkxLTQxZmMtOTAyNS0yMGY3Y2JiMjgyNmQiLCJleHAiOjE3Nzg3MDU1NDV9.0_WQev7HBspMbVMzfsRumjAznsHADTHrTz7oCNJ-I5o",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"senha_atual\": \"teste@123\",\r\n    \"nova_senha\": \"teste@12345\",\r\n    \"confirmacao_senha\": \"teste@12345\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/alterar-senha",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "alterar-senha"
+          ]
+        }
+      },
+      "response": []
     }
   ]
 }

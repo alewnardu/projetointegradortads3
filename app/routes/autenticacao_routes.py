@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.services.autenticacao_service import AutenticacaoService
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 autenticacao_bp = Blueprint('autenticacao_bp', __name__)
 
@@ -30,3 +30,21 @@ def login():
         return jsonify({
             'erro': str(erro)
         }), 401
+
+@autenticacao_bp.route('/alterar-senha', methods=['PATCH'])
+@jwt_required()
+def alterar_senha():
+    try:
+        dados = request.get_json()
+
+        usuario_id = get_jwt_identity()
+
+        AutenticacaoService.alterar_senha(usuario_id,dados)
+
+        return jsonify({
+            'mensagem': 'Senha alterada com sucesso.'
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'erro': str(e)
+        }), 400
