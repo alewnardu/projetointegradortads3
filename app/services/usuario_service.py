@@ -44,16 +44,28 @@ class UsuarioService:
         return UsuarioRepository.salvar(usuario)
 
     @staticmethod
-    def alterar_dados_usuario(usuario):
+    def alterar_dados_usuario(usuario_id, dados):
 
-        usuario_encontrado = UsuarioRepository.buscar_por_email(
-            usuario.email
-        )
+        usuario = UsuarioRepository.buscar_por_id(usuario_id)
 
-        if usuario_encontrado and usuario_encontrado.id != usuario.id:
-            raise Exception('O Email informado já está em uso')
+        if not usuario:
+            raise Exception('Usuário não encontrado')
+
+        email = dados.get('email')
+
+        if email:
+
+            usuario_email_existente = UsuarioRepository.buscar_por_email(email)
+
+            if usuario_email_existente and usuario.id != usuario_email_existente.id:
+                raise Exception('O Email informado já está em uso')
+
+            usuario.email = email
+
+        if 'nome' in dados:
+            usuario.nome = dados['nome']
+
+        if 'perfil' in dados:
+            usuario.perfil = dados['perfil']
 
         return UsuarioRepository.salvar(usuario)
-        
-        
-        
