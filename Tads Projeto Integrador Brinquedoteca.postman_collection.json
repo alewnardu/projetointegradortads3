@@ -1,0 +1,170 @@
+{
+  "info": {
+    "_postman_id": "bba345ef-5ed5-4107-873e-63b5a22cce88",
+    "name": "Tads Projeto Integrador Brinquedoteca",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53478947",
+    "_collection_link": "https://go.postman.co/collection/53478947-bba345ef-5ed5-4107-873e-63b5a22cce88?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "/usuarios",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODY5MTU3MywianRpIjoiODVmOTRhOTMtNmZmZC00M2JlLTgxYjEtZTAxZGIzMGIwMDM2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg2OTE1NzMsImNzcmYiOiI4MDJlOTI0Zi02OGIzLTRlY2MtYjM0Ny02ZDdiM2M5YzQxNWQiLCJleHAiOjE3Nzg2OTE2MzN9.zW32tutyS8CbwRqbxsZR-IySgJWKH3Ry7ExgIHbZwP4",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:5000/usuarios",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "usuarios"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/usuarios",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"nome\": \"Aquiles\",\r\n    \"email\": \"aquilesrodrigues@unitins.br\",\r\n    \"senha\": \"teste@123\",\r\n    \"perfil\": \"ADMIN\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/usuarios",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "usuarios"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/usuarios/id",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"nome\": \"Leonardo\",\r\n    \"email\": \"lewnardu@gmail.com\",\r\n    \"senha\": \"teste@123\",\r\n    \"perfil\": \"ADMIN\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/usuarios/2",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "usuarios",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/usuarios/id/alterar-dados",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"nome\": \"Aquiles Rodrigues\",\r\n    \"email\": \"aquilesrodrigues@unitins.br\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/usuarios/2/alterar-dados",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "usuarios",
+            "2",
+            "alterar-dados"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/login",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"leonardoaraujo@unitins.br\",\r\n    \"senha\": \"teste@123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/login",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "login"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
