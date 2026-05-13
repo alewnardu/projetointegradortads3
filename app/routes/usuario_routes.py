@@ -53,8 +53,7 @@ def deletar_usuario(usuario_id):
             'mensagem': 'Usuário não encontrado'
         }), 404
     
-    return jsonify({''
-    }), 204
+    return '', 204
 
 @usuario_bp.route('/usuarios/<int:usuario_id>/alterar-dados', methods=['PATCH'])
 def alterar_dados_usuario(usuario_id):

@@ -8,6 +8,6 @@ class UsuarioSchema(Schema):
     
     email = fields.String(required=True)
     
-    senha = fields.String(required=True)
+    senha = fields.String(required=True, load_only=True)
     
     perfil = fields.String(required=True)
