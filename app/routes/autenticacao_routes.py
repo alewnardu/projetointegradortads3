@@ -14,13 +14,13 @@ def login():
         
         # Gera token JWT
         access_token = create_access_token(
-            identity=str(usuario.id)
+            identity=usuario.id
         )
 
         # Retorno
         return jsonify({
             'access_token': access_token,
-            'usuario': {
+            'data': {
                 'id': usuario.id,
                 'nome': usuario.nome,
                 'email': usuario.email
@@ -28,7 +28,7 @@ def login():
         }), 200
     except Exception as erro:
         return jsonify({
-            'erro': str(erro)
+            'error': str(erro)
         }), 401
 
 @autenticacao_bp.route('/alterar-senha', methods=['PATCH'])
@@ -42,9 +42,9 @@ def alterar_senha():
         AutenticacaoService.alterar_senha(usuario_id,dados)
 
         return jsonify({
-            'mensagem': 'Senha alterada com sucesso.'
+            'success': 'Senha alterada com sucesso.'
         }), 200
     except Exception as e:
         return jsonify({
-            'erro': str(e)
+            'error': str(e)
         }), 400
