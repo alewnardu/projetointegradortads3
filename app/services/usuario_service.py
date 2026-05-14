@@ -1,36 +1,84 @@
 from werkzeug.security import generate_password_hash
 from app.models.usuario import Usuario
 from app.repositories.usuario_repository import UsuarioRepository
+from app.exceptions import *
 
 class UsuarioService:
 
     @staticmethod
-    def listar_usuarios():
+    def listar_usuarios(usuario_logado_id):
+
+        usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+
+        if not usuario_logado:
+            raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')
+
+        if usuario_logado.perfil != 'ADMIN':
+            raise ForbiddenError('Acesso negado: Você não tem permissão para acessar a lista de usuários')
+
         return UsuarioRepository.listar()
 
     @staticmethod
-    def buscar_usuario(usuario_id):
-        return UsuarioRepository.buscar_por_id(usuario_id)
+    def buscar_usuario(usuario_logado_id, usuario_id):
+        usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+        
+        if not usuario_logado:
+            raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')
+
+        usuario = UsuarioRepository.buscar_por_id(usuario_id)
+
+        if not usuario:
+            raise NotFoundError('Usuário não encontrado')
+
+        if (usuario.id != usuario_logado.id and usuario_logado.perfil != 'ADMIN'):
+            raise ForbiddenError('Acesso negado! Você não tem permissão para acessar os dados deste usuário')
+
+        return usuario
     
     @staticmethod
-    def deletar_usuario(usuario_id):
+    def deletar_usuario(usuario_logado_id, usuario_id):
+        usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+        
+        if not usuario_logado:
+            raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')
+
         usuario = UsuarioRepository.buscar_por_id(usuario_id)
-    
+
         if not usuario:
-            return False
+            raise NotFoundError('Usuário não encontrado')
+        
+        if usuario.id != usuario_logado.id and usuario_logado.perfil != 'ADMIN':
+            raise ForbiddenError('Acesso negado: Você não tem permissão para acessar os dados deste usuário')
 
         UsuarioRepository.deletar(usuario)
         return True
 
     @staticmethod
-    def criar_usuario(dados):
+    def criar_usuario(usuario_logado_id, dados):
+
+        usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+        
+        if not usuario_logado:
+            raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')
+
+        if usuario_logado.perfil != 'ADMIN':
+            raise ForbiddenError('Acesso negado: Você não tem permissão para criar usuários')
+
+        if not all([dados.get('nome'), dados.get('email'), dados.get('senha'), dados.get('confirmacao_senha')]):
+            raise ValidationError('Informe todos os campos obrigatórios')
 
         usuario_existente = UsuarioRepository.buscar_por_email(
             dados['email']
         )
 
         if usuario_existente:
-            raise Exception('O Email informado já está em uso')
+            raise EmailAlreadyExistsError('O Email informado já está em uso')
+
+        if dados['senha'] != dados['confirmacao_senha']:
+            raise ValidationError('A senha e a confirmação de senha não coincidem')
+
+        if dados['perfil'] not in ['ADMIN', 'CIDADAO']:
+            raise ValidationError('Perfil inválido. Os perfis permitidos são ADMIN e CIDADAO')
 
         senha_hash = generate_password_hash(dados['senha'])
 
@@ -44,12 +92,20 @@ class UsuarioService:
         return UsuarioRepository.salvar(usuario)
 
     @staticmethod
-    def alterar_dados_usuario(usuario_id, dados):
+    def alterar_dados_usuario(usuario_logado_id, usuario_id, dados):
+
+        usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+
+        if not usuario_logado:
+            raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')
 
         usuario = UsuarioRepository.buscar_por_id(usuario_id)
 
         if not usuario:
-            raise Exception('Usuário não encontrado')
+            raise NotFoundError('Usuário não encontrado')
+        
+        if (usuario.id != usuario_logado.id and usuario_logado.perfil != 'ADMIN'):
+            raise ForbiddenError('Acesso negado! Você não tem permissão para acessar os dados deste usuário')
 
         email = dados.get('email')
 
@@ -58,7 +114,7 @@ class UsuarioService:
             usuario_email_existente = UsuarioRepository.buscar_por_email(email)
 
             if usuario_email_existente and usuario.id != usuario_email_existente.id:
-                raise Exception('O Email informado já está em uso')
+                raise EmailAlreadyExistsError('O Email informado já está em uso')
 
             usuario.email = email
 

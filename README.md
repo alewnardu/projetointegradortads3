@@ -138,12 +138,17 @@ app/
 ├── blueprints.py
 ├── config.py
 ├── extensions.py
+├── exceptions.py
 └── __init__.py
 
 migrations/
-run.py
-requirements.txt
+.env-exemplo
+.gitignore
+LICENSE
 README.md
+requirements.txt
+run.py
+Tads Projeto Integrador Brinquedoteca.postman_collection
 ```
 
 ---
