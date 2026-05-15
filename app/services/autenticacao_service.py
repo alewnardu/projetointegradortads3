@@ -1,4 +1,3 @@
-
 from flask import current_app
 from app.repositories.usuario_repository import UsuarioRepository
 from werkzeug.security import (check_password_hash, generate_password_hash)
@@ -100,4 +99,4 @@ class AutenticacaoService:
             raise ValidationError('A nova senha e a confirmação não coincidem')
         
         usuario.senha = generate_password_hash(nova_senha)
-        UsuarioRepository.salvar(usuario)
+        return UsuarioRepository.salvar(usuario)
