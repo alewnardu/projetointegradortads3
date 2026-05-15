@@ -16,10 +16,8 @@ def login():
 
         usuario = AutenticacaoService.autenticar_usuario(dados)
         
-        # Gera token JWT
         access_token = create_access_token(identity=usuario.id)
 
-        # Retorno
         return jsonify({
             'access_token': access_token,
             'data': {
@@ -58,15 +56,32 @@ def recuperar_senha():
         return jsonify({
             'error': str(e)
         }), 400
-    except Exception:
+    except Exception as e:
         return jsonify({
-            'error': 'Erro interno do servidor'
+            'error': str(e)
         }), 500
 
 @autenticacao_bp.route('/redefinir-senha', methods=['PATCH'])
 def redefinir_senha():
-    pass
-
+    try:
+        dados = request.get_json()
+        AutenticacaoService.redefinir_senha(dados)
+        return jsonify({
+            'success': True,
+            'message': 'Senha redefinida com sucesso'
+        }), 200
+    except ValidationError as e:
+        return jsonify({
+            'error': str(e)
+        }), 400
+    except AuthenticationError as e:
+        return jsonify({
+            'error': str(e)
+        }), 401
+    except Exception:
+        return jsonify({
+            'error': 'Erro interno do servidor'
+        }), 500
 
 @autenticacao_bp.route('/alterar-senha', methods=['PATCH'])
 @jwt_required()
