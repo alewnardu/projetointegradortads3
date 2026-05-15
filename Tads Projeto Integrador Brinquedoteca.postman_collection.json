@@ -103,7 +103,7 @@
       "response": []
     },
     {
-      "name": "/usuarios/id/alterar-dados",
+      "name": "/usuarios/id",
       "request": {
         "method": "PATCH",
         "header": [],
@@ -117,7 +117,7 @@
           }
         },
         "url": {
-          "raw": "http://127.0.0.1:5000/usuarios/2/alterar-dados",
+          "raw": "http://127.0.0.1:5000/usuarios/2",
           "protocol": "http",
           "host": [
             "127",
@@ -128,8 +128,7 @@
           "port": "5000",
           "path": [
             "usuarios",
-            "2",
-            "alterar-dados"
+            "2"
           ]
         }
       },
@@ -142,7 +141,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"email\": \"leonardoaraujo@unitins.br\",\r\n    \"senha\": \"teste@123\"\r\n}",
+          "raw": "{\r\n    \"email\": \"leonardoaraujo@unitins.br\",\r\n    \"senha\": \"teste@12345\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -202,6 +201,68 @@
           "port": "5000",
           "path": [
             "alterar-senha"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/recuperar-senha",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"leonardoaraujo@unitins.br\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/recuperar-senha",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "recuperar-senha"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/recuperar-senha",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4MDY0OCwianRpIjoiNTdiZGMwZDAtNzEzNi00ZDE3LWJiYWQtYzhlZDkxZjFiODFkIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNzc4ODgwNjQ4LCJjc3JmIjoiNzQzODlkZmMtZmEyZC00ZDFhLWIyZTMtYmU3NDQxYTM1OTczIiwiZXhwIjoxNzc4ODgwOTQ4fQ.V_Zxi40bFIFkJRmNCeRQyvwXs_k4WQTtJSyV5vzr-wQ\",\r\n    \"nova_senha\": \"teste@321\",\r\n    \"confirmacao_senha\": \"teste@321\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/redefinir-senha",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "redefinir-senha"
           ]
         }
       },
