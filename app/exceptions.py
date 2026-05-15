@@ -12,3 +12,6 @@ class ValidationError(Exception):
 
 class UnauthorizedError(Exception):
     pass
+
+class AuthenticationError(Exception):
+    pass
