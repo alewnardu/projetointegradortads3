@@ -8,12 +8,11 @@ class UsuarioService:
     @staticmethod
     def listar_usuarios(usuario_logado_id):
 
-        usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
-
-        if not usuario_logado:
+        if not usuario_logado_id:
             raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')
-
-        if usuario_logado.perfil != 'ADMIN':
+        
+        usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+        if not usuario_logado or usuario_logado.perfil != 'ADMIN':
             raise ForbiddenError('Acesso negado: Você não tem permissão para acessar a lista de usuários')
 
         return UsuarioRepository.listar()
@@ -21,7 +20,6 @@ class UsuarioService:
     @staticmethod
     def buscar_usuario(usuario_logado_id, usuario_id):
         usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
-        
         if not usuario_logado:
             raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')
 

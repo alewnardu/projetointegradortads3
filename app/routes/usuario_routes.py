@@ -13,8 +13,8 @@ usuarios_schema = UsuarioSchema(many=True)
 @jwt_required()
 def listar_usuarios():
     try:
-        usuario_logado_id = get_jwt_identity()
-        usuarios = UsuarioService.listar_usuarios(usuario_logado_id)
+        usuario_logado = get_jwt_identity()
+        usuarios = UsuarioService.listar_usuarios(usuario_logado)
         return jsonify({
             'data': usuarios_schema.dump(usuarios)
         }), 200

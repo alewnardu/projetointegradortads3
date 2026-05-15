@@ -16,7 +16,7 @@ def login():
 
         usuario = AutenticacaoService.autenticar_usuario(dados)
         
-        access_token = create_access_token(identity=usuario.id)
+        access_token = create_access_token(identity=str(usuario.id))
 
         return jsonify({
             'access_token': access_token,
