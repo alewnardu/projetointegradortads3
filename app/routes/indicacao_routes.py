@@ -87,3 +87,35 @@ def criar_indicacao():
         return jsonify({
             'error': f'Erro interno do servidor - {str(e)}'
         }), 500
+    
+@indicacao_bp.route("/indicacoes/<int:indicacao_id>/rejeitar", methods=["PATCH"])
+@jwt_required()
+def rejeitar_indicacao(indicacao_id):
+    try:
+        usuario_logado_id = get_jwt_identity()
+        indicacao = IndicacaoService.rejeitar_indicacao(indicacao_id, usuario_logado_id)
+        return jsonify({
+            'success': True,
+            'message': 'Indicação rejeitada',
+            'data': indicacao_schema.dump(indicacao)
+        }), 200
+    except UnauthorizedError as e:
+        return jsonify({
+            'error': str(e)
+        }), 401
+    except NotFoundError as e:
+        return jsonify({
+            'error': str(e)
+        }), 404
+    except ForbiddenError as e:
+        return jsonify({
+            'error': str(e)
+        }), 403
+    except BadRequestError as e:
+        return jsonify({
+            'error': str(e)
+        }), 400
+    except Exception:
+        return jsonify({
+            'error': 'Erro interno do servidor'
+        }), 500
