@@ -3,6 +3,7 @@ from app.schemas.indicacao_schema import IndicacaoSchema
 from app.services.indicacao_service import IndicacaoService
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.exceptions import *
+from marshmallow import ValidationError as MarshmallowValidationError
 
 indicacao_bp = Blueprint('indicacao_bp', __name__)
 
@@ -55,4 +56,34 @@ def buscar_indicacao(indicacao_id):
     except Exception:
         return jsonify({
             'error': 'Erro interno do servidor'
+        }), 500
+
+@indicacao_bp.route("/indicacoes", methods=["POST"])
+@jwt_required()
+def criar_indicacao():
+    try:
+        dados = indicacao_schema.load(request.get_json())
+        usuario_logado_id = get_jwt_identity()
+        indicacao = IndicacaoService.criar_indicacao(usuario_logado_id, dados)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Indicação criada com sucesso',
+            'data': indicacao_schema.dump(indicacao)
+        }), 201
+    except MarshmallowValidationError as e:
+        return jsonify({
+            'error': str(e)
+        }), 400
+    except UnauthorizedError as e:
+        return jsonify({
+            'error': str(e)
+        }), 401
+    except BadRequestError as e:
+        return jsonify({
+            'error': str(e)
+        }), 400
+    except Exception as e:
+        return jsonify({
+            'error': f'Erro interno do servidor - {str(e)}'
         }), 500
