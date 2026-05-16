@@ -23,7 +23,8 @@ def login():
             'data': {
                 'id': usuario.id,
                 'nome': usuario.nome,
-                'email': usuario.email
+                'email': usuario.email,
+                'perfil': usuario.perfil
             }
         }), 200
     except NotFoundError as e:

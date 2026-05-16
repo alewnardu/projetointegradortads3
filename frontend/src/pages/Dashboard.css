@@ -1,0 +1,90 @@
+.dashboard-container {
+  min-height: 100vh;
+  background-color: var(--surface-container-low);
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-header {
+  background-color: var(--surface);
+  padding: var(--spacing-md) var(--spacing-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-level-1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.header-logo {
+  width: 60px;
+  height: auto;
+  object-fit: contain;
+}
+
+.dashboard-brand h1 {
+  color: var(--primary);
+  font-size: var(--text-xl);
+  margin: 0;
+}
+
+.dashboard-user {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  color: var(--on-surface);
+  font-weight: 500;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+}
+
+.dashboard-main {
+  flex: 1;
+  padding: var(--spacing-xl);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-xl);
+}
+
+.action-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-level-2);
+}
+
+.action-card h2 {
+  color: var(--on-surface);
+  margin: 0;
+}
+
+.action-card p {
+  color: var(--on-surface-variant);
+  margin: 0;
+  flex: 1; /* Pushes the button to the bottom */
+}

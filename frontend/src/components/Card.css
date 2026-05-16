@@ -1,0 +1,12 @@
+.card {
+  background-color: #ffffff;
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-level-1);
+  transition: all 0.2s ease-in-out;
+}
+
+.card-hoverable:hover {
+  transform: scale(1.02) translateY(-2px);
+  box-shadow: var(--shadow-level-2);
+}
