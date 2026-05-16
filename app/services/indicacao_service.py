@@ -2,6 +2,7 @@ from app.models.indicacao import Indicacao
 from app.repositories.indicacao_repository import IndicacaoRepository
 from app.exceptions import *
 from app.repositories.usuario_repository import UsuarioRepository
+from datetime import datetime
 
 class IndicacaoService:
 
@@ -34,8 +35,8 @@ class IndicacaoService:
         if not indicacao:
             raise NotFoundError('Indicação de brinquedoteca não encontrada')
 
-        if usuario_logado.perfil != 'ADMIN' and indicacao.usuario.id != usuario_logado.id:
-            raise ForbiddenError('Acesso negado! Você não tem permissão para acessar essa indicação.')
+        if usuario_logado.perfil != 'ADMIN' and indicacao.usuario_indicador_id != usuario_logado.id:
+            raise ForbiddenError('Acesso negado! Você não tem permissão para acessar as indicações de terceiros.')
 
         return indicacao
 
@@ -49,4 +50,75 @@ class IndicacaoService:
 
         indicacao = Indicacao(**dados, usuario_indicador=usuario_logado)
     
+        return IndicacaoRepository.salvar(indicacao)
+    
+    @staticmethod
+    def rejeitar_indicacao(indicacao_id, usuario_logado_id):
+
+        usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+
+        if not usuario_logado:
+            raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')        
+
+        indicacao = IndicacaoRepository.buscar_por_id(indicacao_id)
+        if not indicacao:
+            raise NotFoundError('Indicação de brinquedoteca não encontrada')
+
+        if usuario_logado.perfil != 'ADMIN':
+            raise ForbiddenError('Acesso negado! Você não tem permissão para analisar indicações.')
+
+        if indicacao.status != 'PENDENTE':
+            raise BadRequestError(f'Não é possível rejeitar uma indicação com status {indicacao.status}')
+
+        indicacao.status = 'REJEITADA'
+        indicacao.usuario_analisador = usuario_logado
+        indicacao.data_rejeicao = datetime.utcnow()
+
+        return IndicacaoRepository.salvar(indicacao)
+    
+    @staticmethod
+    def cancelar_indicacao(indicacao_id, usuario_logado_id):
+
+        usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+
+        if not usuario_logado:
+            raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')        
+
+        indicacao = IndicacaoRepository.buscar_por_id(indicacao_id)
+        if not indicacao:
+            raise NotFoundError('Indicação de brinquedoteca não encontrada')
+
+        if indicacao.usuario_indicador_id != usuario_logado.id and usuario_logado.perfil != 'ADMIN':
+            raise ForbiddenError('Acesso negado! Você não tem permissão para cancelar indicações de terceiros.')
+
+        if indicacao.status != 'PENDENTE':
+            raise BadRequestError(f'Não é possível cancelar uma indicação com status {indicacao.status}')
+
+        indicacao.status = 'CANCELADA'
+        indicacao.usuario_analisador = usuario_logado
+        indicacao.data_rejeicao = datetime.utcnow()
+
+        return IndicacaoRepository.salvar(indicacao)
+
+    @staticmethod
+    def atualizar_indicacao(indicacao_id, usuario_logado_id, dados):
+
+        usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+
+        if not usuario_logado:
+            raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')        
+
+        indicacao = IndicacaoRepository.buscar_por_id(indicacao_id)
+        if not indicacao:
+            raise NotFoundError('Indicação de brinquedoteca não encontrada')
+
+        if indicacao.usuario_indicador_id != usuario_logado.id and usuario_logado.perfil != 'ADMIN':
+            raise ForbiddenError('Acesso negado! Você não tem permissão para atualizar indicações de terceiros.')
+
+        if indicacao.status != 'PENDENTE':
+            raise BadRequestError(f'Não é possível atualizar uma indicação com status {indicacao.status}')
+
+        for key, value in dados.items():
+            setattr(indicacao, key, value)
+
         return IndicacaoRepository.salvar(indicacao)
