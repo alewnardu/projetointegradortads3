@@ -99,4 +99,26 @@ class IndicacaoService:
         indicacao.data_rejeicao = datetime.utcnow()
 
         return IndicacaoRepository.salvar(indicacao)
-    
+
+    @staticmethod
+    def atualizar_indicacao(indicacao_id, usuario_logado_id, dados):
+
+        usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+
+        if not usuario_logado:
+            raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')        
+
+        indicacao = IndicacaoRepository.buscar_por_id(indicacao_id)
+        if not indicacao:
+            raise NotFoundError('Indicação de brinquedoteca não encontrada')
+
+        if indicacao.usuario_indicador_id != usuario_logado.id and usuario_logado.perfil != 'ADMIN':
+            raise ForbiddenError('Acesso negado! Você não tem permissão para atualizar indicações de terceiros.')
+
+        if indicacao.status != 'PENDENTE':
+            raise BadRequestError(f'Não é possível atualizar uma indicação com status {indicacao.status}')
+
+        for key, value in dados.items():
+            setattr(indicacao, key, value)
+
+        return IndicacaoRepository.salvar(indicacao)

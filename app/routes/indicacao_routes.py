@@ -151,3 +151,41 @@ def cancelar_indicacao(indicacao_id):
         return jsonify({
             'error': 'Erro interno do servidor'
         }), 500
+    
+@indicacao_bp.route("/indicacoes/<int:indicacao_id>", methods=["PATCH"])
+@jwt_required()
+def atualizar_indicacao(indicacao_id):
+    try:
+        dados = indicacao_schema.load(request.get_json(), partial=True)
+        usuario_logado_id = get_jwt_identity()
+        indicacao = IndicacaoService.atualizar_indicacao(indicacao_id, usuario_logado_id, dados)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Indicação atualizada com sucesso',
+            'data': indicacao_schema.dump(indicacao)
+        }), 200
+    except MarshmallowValidationError as e:
+        return jsonify({
+            'error': str(e)
+        }), 400
+    except UnauthorizedError as e:
+        return jsonify({
+            'error': str(e)
+        }), 401
+    except NotFoundError as e:
+        return jsonify({
+            'error': str(e)
+        }), 404
+    except ForbiddenError as e:
+        return jsonify({
+            'error': str(e)
+        }), 403
+    except BadRequestError as e:
+        return jsonify({
+            'error': str(e)
+        }), 400
+    except Exception as e:
+        return jsonify({
+            'error': f'Erro interno do servidor - {str(e)}'
+        }), 500
