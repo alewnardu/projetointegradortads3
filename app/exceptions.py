@@ -15,3 +15,6 @@ class UnauthorizedError(Exception):
 
 class AuthenticationError(Exception):
     pass
+
+class BadRequestError(Exception):
+    pass

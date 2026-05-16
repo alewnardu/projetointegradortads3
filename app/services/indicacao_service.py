@@ -38,3 +38,15 @@ class IndicacaoService:
             raise ForbiddenError('Acesso negado! Você não tem permissão para acessar essa indicação.')
 
         return indicacao
+
+    @staticmethod
+    def criar_indicacao(usuario_logado_id, dados):
+        
+        usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+
+        if not usuario_logado:
+            raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')        
+
+        indicacao = Indicacao(**dados, usuario_indicador=usuario_logado)
+    
+        return IndicacaoRepository.salvar(indicacao)

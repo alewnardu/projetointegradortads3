@@ -12,9 +12,9 @@ class IndicacaoSchema(Schema):
 
     status = fields.String(dump_only=True)
 
-    data_aprovacao = fields.DateTime(allow_none=True)
+    data_aprovacao = fields.DateTime(dump_only=True)
 
-    data_rejeicao = fields.DateTime(allow_none=True)
+    data_rejeicao = fields.DateTime(dump_only=True)
 
     tem_climatizacao = fields.Boolean(load_default=False)
 
@@ -23,6 +23,7 @@ class IndicacaoSchema(Schema):
     tem_gratuidade = fields.Boolean(load_default=False)
 
     porte = fields.String(
+        load_default='MEDIO',
         validate=validate.OneOf([
             'PEQUENO',
             'MEDIO',
@@ -30,6 +31,6 @@ class IndicacaoSchema(Schema):
         ])
     )
 
-    usuario_indicador_id = fields.Integer(required=True)
+    usuario_indicador_id = fields.Integer(dump_only=True)
 
-    usuario_analisador_id = fields.Integer(allow_none=True)
+    usuario_analisador_id = fields.Integer(dump_only=True)
