@@ -30,3 +30,29 @@ def listar_indicacoes():
         return jsonify({
             'error': 'Erro interno do servidor'
         }), 500
+
+@indicacao_bp.route("/indicacoes/<int:indicacao_id>", methods=["GET"])
+@jwt_required()
+def buscar_indicacao(indicacao_id):
+    try:
+        usuario_logado_id = get_jwt_identity()
+        indicacao = IndicacaoService.buscar_indicacao(indicacao_id, usuario_logado_id)
+        return jsonify({
+            'data': indicacao_schema.dump(indicacao)
+        }), 200
+    except NotFoundError as e:
+        return jsonify({
+            'error': str(e)
+        }), 404
+    except UnauthorizedError as e:
+        return jsonify({
+            'error': str(e)
+        }), 401
+    except ForbiddenError as e:
+        return jsonify({
+            'error': str(e)
+        }), 403
+    except Exception:
+        return jsonify({
+            'error': 'Erro interno do servidor'
+        }), 500
