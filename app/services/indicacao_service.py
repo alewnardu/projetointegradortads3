@@ -35,8 +35,8 @@ class IndicacaoService:
         if not indicacao:
             raise NotFoundError('Indicação de brinquedoteca não encontrada')
 
-        if usuario_logado.perfil != 'ADMIN' and indicacao.usuario.id != usuario_logado.id:
-            raise ForbiddenError('Acesso negado! Você não tem permissão para acessar essa indicação.')
+        if usuario_logado.perfil != 'ADMIN' and indicacao.usuario_indicador_id != usuario_logado.id:
+            raise ForbiddenError('Acesso negado! Você não tem permissão para acessar as indicações de terceiros.')
 
         return indicacao
 
