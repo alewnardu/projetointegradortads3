@@ -175,7 +175,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4Mzg4OSwianRpIjoiZTU5YjEzOTAtMzA4MC00Y2QwLThjNzUtZDIzZDk3N2RjYWYzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODM4ODksImNzcmYiOiJkOTk2YjE4Zi00NWFjLTQxOGEtODNkYy1jYmY2ODIyNTA2MTUiLCJleHAiOjE3Nzg4ODQxODl9.r5WrtIAO-fZiXzQ3WBsgC9Od_TxxOOHtBlQaUfS_yKU",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4NDI0MCwianRpIjoiNGRjOWE1MGItOGQ5YS00Yzc3LWE2ZTEtMGI4ZTFlOGUyZjE5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODQyNDAsImNzcmYiOiJjOTZkNzYxZi0xNDgzLTRiNDItOWM1Yy1iZWVhZGU0OTkwMzgiLCJleHAiOjE3Nzg4ODQ1NDB9.Xg8EAGeVuD8XUp-5wv2IAZWBFkpPbTZr8kT_LBt9gtc",
               "type": "string"
             }
           ]
@@ -184,7 +184,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"perfil\": \"ADMIN\"\r\n}",
+          "raw": "{\r\n    \"perfil\": \"CIDADAO\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -192,7 +192,7 @@
           }
         },
         "url": {
-          "raw": "http://127.0.0.1:5000/usuarios/1",
+          "raw": "http://127.0.0.1:5000/usuarios/3",
           "protocol": "http",
           "host": [
             "127",
@@ -203,7 +203,7 @@
           "port": "5000",
           "path": [
             "usuarios",
-            "1"
+            "3"
           ]
         }
       },
@@ -338,6 +338,75 @@
           "port": "5000",
           "path": [
             "redefinir-senha"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/indicacoes",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk0MzE3MywianRpIjoiZTM5ZDBmMjktYzExNy00ZDNiLThlYzgtNWI3N2U5MzBiNDZmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg5NDMxNzMsImNzcmYiOiJmNDc2ZDI1My0zMDE1LTQ4MDgtODYzNS1jNDQ2OGY3NDQ5MDgiLCJleHAiOjE3Nzg5NDM0NzN9.9ljyatSTPh3fAHXos9UT4KRJ5ivyTwbpmrkNKrGMn4M",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": []
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/indicacoes",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "indicacoes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/indicacoes/id",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": []
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/indicacoes/1",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "indicacoes",
+            "1"
           ]
         }
       },
