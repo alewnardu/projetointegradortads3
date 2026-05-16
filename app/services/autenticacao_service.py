@@ -27,6 +27,40 @@ class AutenticacaoService:
             raise AuthenticationError('Falha na autenticação')
 
         return usuario
+
+    @staticmethod
+    def cadastrar(dados):
+        from app.repositories.usuario_repository import UsuarioRepository
+        from app.models.usuario import Usuario
+        from werkzeug.security import generate_password_hash
+        from app.exceptions import ValidationError, EmailAlreadyExistsError
+
+        nome = dados.get('nome')
+        email = dados.get('email')
+        senha = dados.get('senha')
+        confirmacao_senha = dados.get('confirmacao_senha')
+
+        if not all([nome, email, senha, confirmacao_senha]):
+            raise ValidationError('Informe todos os campos obrigatórios: nome, email, senha e confirmação de senha')
+
+        if senha != confirmacao_senha:
+            raise ValidationError('A senha e a confirmação de senha não coincidem')
+
+        if len(senha) < 6:
+            raise ValidationError('A senha deve ter no mínimo 6 caracteres')
+
+        usuario_existente = UsuarioRepository.buscar_por_email(email)
+        if usuario_existente:
+            raise EmailAlreadyExistsError('Este e-mail já está em uso')
+
+        usuario = Usuario(
+            nome=nome,
+            email=email,
+            senha=generate_password_hash(senha),
+            perfil='CIDADAO'
+        )
+
+        return UsuarioRepository.salvar(usuario)
     
     @staticmethod
     def recuperar_senha(dados):

@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600&family=Quicksand:wght@600;700&display=swap');
+
+:root {
+  /* Colors */
+  --surface: #f9f9ff;
+  --surface-dim: #d3dae9;
+  --surface-bright: #f9f9ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f0f3ff;
+  --surface-container: #e7eefe;
+  --surface-container-high: #e2e8f8;
+  --surface-container-highest: #dce3f2;
+  --on-surface: #151c27;
+  --on-surface-variant: #554338;
+  --inverse-surface: #2a313c;
+  --inverse-on-surface: #ebf1ff;
+  --outline: #887366;
+  --outline-variant: #dcc1b2;
+  --primary: #974900;
+  --on-primary: #ffffff;
+  --primary-container: #f48b3d;
+  --on-primary-container: #622d00;
+  --secondary: #186d0f;
+  --on-secondary: #ffffff;
+  --secondary-container: #a0f88a;
+  --on-secondary-container: #207416;
+  --tertiary: #775a00;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #cda01c;
+  --on-tertiary-container: #4c3900;
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+  --background: #f9f9ff;
+  --on-background: #151c27;
+
+  /* Typography Fonts */
+  --font-headings: 'Quicksand', sans-serif;
+  --font-body: 'Be Vietnam Pro', sans-serif;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 40px;
+  --spacing-xxl: 64px;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;     /* 16px */
+  --radius-xl: 1.5rem;   /* 24px */
+  --radius-full: 9999px;
+
+  /* Shadows (from DESIGN.md Depth) */
+  --shadow-level-1: 0px 4px 20px rgba(0, 0, 0, 0.06);
+  --shadow-level-2: 0px 8px 30px rgba(0, 0, 0, 0.1);
+  --shadow-level-3: 0px 16px 40px rgba(0, 0, 0, 0.15); /* added for deeper modals */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--background);
+  color: var(--on-background);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headings);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--on-surface);
+  margin-bottom: var(--spacing-sm);
+}
+
+h1 { font-size: 40px; }
+h2 { font-size: 32px; }
+h3 { font-size: 24px; }
+h4 { font-size: 20px; }
+
+p {
+  font-size: 16px;
+  line-height: 24px;
+  margin-bottom: var(--spacing-md);
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Base utility classes based on design system */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-lg);
+  }
+}
+
+/* Glassmorphism for level 3 modals */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}

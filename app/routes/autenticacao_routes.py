@@ -23,7 +23,8 @@ def login():
             'data': {
                 'id': usuario.id,
                 'nome': usuario.nome,
-                'email': usuario.email
+                'email': usuario.email,
+                'perfil': usuario.perfil
             }
         }), 200
     except NotFoundError as e:
@@ -82,6 +83,26 @@ def redefinir_senha():
         return jsonify({
             'error': 'Erro interno do servidor'
         }), 500
+
+@autenticacao_bp.route('/cadastro', methods=['POST'])
+def cadastro():
+    try:
+        dados = request.get_json()
+        usuario = AutenticacaoService.cadastrar(dados)
+        return jsonify({
+            'success': True,
+            'message': 'Cadastro realizado com sucesso',
+            'data': {
+                'id': usuario.id,
+                'nome': usuario.nome,
+                'email': usuario.email,
+                'perfil': usuario.perfil
+            }
+        }), 201
+    except Exception as e:
+        return jsonify({
+            'error': str(e)
+        }), 400
 
 @autenticacao_bp.route('/alterar-senha', methods=['PATCH'])
 @jwt_required()
