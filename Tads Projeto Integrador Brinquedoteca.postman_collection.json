@@ -15,7 +15,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODY5MTU3MywianRpIjoiODVmOTRhOTMtNmZmZC00M2JlLTgxYjEtZTAxZGIzMGIwMDM2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg2OTE1NzMsImNzcmYiOiI4MDJlOTI0Zi02OGIzLTRlY2MtYjM0Ny02ZDdiM2M5YzQxNWQiLCJleHAiOjE3Nzg2OTE2MzN9.zW32tutyS8CbwRqbxsZR-IySgJWKH3Ry7ExgIHbZwP4",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4NDU4NywianRpIjoiM2FmZjM1NjItYWU0NS00ZTcwLTk5MTAtYTAwZmVlYjNjN2Y0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODQ1ODcsImNzcmYiOiJhMjhkNTM0OS04NjFlLTQwYjEtODNiMS05MjU2MTdmMGU1ZDIiLCJleHAiOjE3Nzg4ODQ4ODd9.tQykabzTlFIMWCj4hbkEwSs5zOzFAYfju-j7LiPCqJw",
               "type": "string"
             }
           ]
@@ -40,13 +40,68 @@
       "response": []
     },
     {
+      "name": "/usuarios/id",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4MjQyMSwianRpIjoiNzY4YTZiMDEtMzI4OC00NTE1LTkzMDMtMjgzMGJiOWY4NzA2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNzc4ODgyNDIxLCJjc3JmIjoiOTQxNjNlYzMtOGNiOC00NDM4LWEzM2UtNWZhMzhjYTgxYzEzIiwiZXhwIjoxNzc4ODgyNzIxfQ.pr3T-ifdJo6ySqWi4zeVBGfGNLbM8z3YtOP__tZ2M4Q",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/usuarios/1",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "usuarios",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "/usuarios",
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4Mzg4OSwianRpIjoiZTU5YjEzOTAtMzA4MC00Y2QwLThjNzUtZDIzZDk3N2RjYWYzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODM4ODksImNzcmYiOiJkOTk2YjE4Zi00NWFjLTQxOGEtODNkYy1jYmY2ODIyNTA2MTUiLCJleHAiOjE3Nzg4ODQxODl9.r5WrtIAO-fZiXzQ3WBsgC9Od_TxxOOHtBlQaUfS_yKU",
+              "type": "string"
+            }
+          ]
+        },
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"nome\": \"Aquiles\",\r\n    \"email\": \"aquilesrodrigues@unitins.br\",\r\n    \"senha\": \"teste@123\",\r\n    \"perfil\": \"ADMIN\"\r\n}",
+          "raw": "{\r\n    \"nome\": \"Wendel\",\r\n    \"email\": \"wendel@unitins.br\",\r\n    \"senha\": \"teste@123\",\r\n    \"confirmacao_senha\": \"teste@123\",\r\n    \"perfil\": \"ADMIN\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -73,6 +128,16 @@
     {
       "name": "/usuarios/id",
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4NDI0MCwianRpIjoiNGRjOWE1MGItOGQ5YS00Yzc3LWE2ZTEtMGI4ZTFlOGUyZjE5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODQyNDAsImNzcmYiOiJjOTZkNzYxZi0xNDgzLTRiNDItOWM1Yy1iZWVhZGU0OTkwMzgiLCJleHAiOjE3Nzg4ODQ1NDB9.Xg8EAGeVuD8XUp-5wv2IAZWBFkpPbTZr8kT_LBt9gtc",
+              "type": "string"
+            }
+          ]
+        },
         "method": "DELETE",
         "header": [],
         "body": {
@@ -85,7 +150,7 @@
           }
         },
         "url": {
-          "raw": "http://127.0.0.1:5000/usuarios/2",
+          "raw": "http://127.0.0.1:5000/usuarios/4",
           "protocol": "http",
           "host": [
             "127",
@@ -96,20 +161,30 @@
           "port": "5000",
           "path": [
             "usuarios",
-            "2"
+            "4"
           ]
         }
       },
       "response": []
     },
     {
-      "name": "/usuarios/id/alterar-dados",
+      "name": "/usuarios/id",
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4Mzg4OSwianRpIjoiZTU5YjEzOTAtMzA4MC00Y2QwLThjNzUtZDIzZDk3N2RjYWYzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODM4ODksImNzcmYiOiJkOTk2YjE4Zi00NWFjLTQxOGEtODNkYy1jYmY2ODIyNTA2MTUiLCJleHAiOjE3Nzg4ODQxODl9.r5WrtIAO-fZiXzQ3WBsgC9Od_TxxOOHtBlQaUfS_yKU",
+              "type": "string"
+            }
+          ]
+        },
         "method": "PATCH",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"nome\": \"Aquiles Rodrigues\",\r\n    \"email\": \"aquilesrodrigues@unitins.br\"\r\n}",
+          "raw": "{\r\n    \"perfil\": \"ADMIN\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -117,7 +192,7 @@
           }
         },
         "url": {
-          "raw": "http://127.0.0.1:5000/usuarios/2/alterar-dados",
+          "raw": "http://127.0.0.1:5000/usuarios/1",
           "protocol": "http",
           "host": [
             "127",
@@ -128,8 +203,7 @@
           "port": "5000",
           "path": [
             "usuarios",
-            "2",
-            "alterar-dados"
+            "1"
           ]
         }
       },
@@ -174,7 +248,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODcwNTI0NSwianRpIjoiZDRjMGI3MDgtZjJhYS00ZmNhLWE0YzEtMTM1NmVhYzZiOWVlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg3MDUyNDUsImNzcmYiOiJkMWZjZGJmYS0xZjkxLTQxZmMtOTAyNS0yMGY3Y2JiMjgyNmQiLCJleHAiOjE3Nzg3MDU1NDV9.0_WQev7HBspMbVMzfsRumjAznsHADTHrTz7oCNJ-I5o",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4NDQ0MCwianRpIjoiZTExZDMzY2QtODg2OC00ZmMxLTk2OTctZDZiODZiNTRkMmQ5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODQ0NDAsImNzcmYiOiJiYjYwNGI2Ny04OTU5LTQxOWUtYTY1Zi01Yzc5NWJmNGNhYjQiLCJleHAiOjE3Nzg4ODQ3NDB9.uCROLW6v9dlFMWm-C8yQBjMLe-mdOCuVA3v0XLnpvRg",
               "type": "string"
             }
           ]
@@ -183,7 +257,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"senha_atual\": \"teste@123\",\r\n    \"nova_senha\": \"teste@12345\",\r\n    \"confirmacao_senha\": \"teste@12345\"\r\n}",
+          "raw": "{\r\n    \"senha_atual\": \"teste@123\",\r\n    \"nova_senha\": \"teste@123\",\r\n    \"confirmacao_senha\": \"teste@123\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -202,6 +276,68 @@
           "port": "5000",
           "path": [
             "alterar-senha"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/recuperar-senha",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"leonardoaraujo@unitins.br\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/recuperar-senha",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "recuperar-senha"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/redefinir-senha",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4NDQ3MywianRpIjoiMmQ1NmI1OWItNDAwNC00MjZlLTg3MGQtMWMyMzczMzZmZWU4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODQ0NzMsImNzcmYiOiIyNGVhY2U0NC02MjU2LTRkNjctYTA3Yi1lMjhlYTQ2YjRjYmQiLCJleHAiOjE3Nzg4ODQ3NzMsInB1cnBvc2UiOiJwYXNzd29yZF9yZXNldCJ9.XcXZPgzbkwzLvH48ZmQhXfTUCHJZh0lwPVECW-q6p5s\",\r\n    \"nova_senha\": \"teste@123\",\r\n    \"confirmacao_senha\": \"teste@123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/redefinir-senha",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "redefinir-senha"
           ]
         }
       },

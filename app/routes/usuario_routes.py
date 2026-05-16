@@ -13,8 +13,8 @@ usuarios_schema = UsuarioSchema(many=True)
 @jwt_required()
 def listar_usuarios():
     try:
-        usuario_logado_id = get_jwt_identity()
-        usuarios = UsuarioService.listar_usuarios(usuario_logado_id)
+        usuario_logado = get_jwt_identity()
+        usuarios = UsuarioService.listar_usuarios(usuario_logado)
         return jsonify({
             'data': usuarios_schema.dump(usuarios)
         }), 200
@@ -26,7 +26,7 @@ def listar_usuarios():
         return jsonify({
             'error': str(e)
         }), 403
-    except Exception as e:
+    except Exception:
         return jsonify({
             'error': 'Erro interno do servidor'
         }), 500
@@ -98,7 +98,7 @@ def criar_usuario():
             'error': str(e)
         }), 409
     
-    except Exception as e:
+    except Exception:
         return jsonify({
             'error': 'Erro interno do servidor'
         }), 500
@@ -124,7 +124,7 @@ def deletar_usuario(usuario_id):
         return jsonify({
             'error': str(e)
         }), 404
-    except Exception as e:
+    except Exception:
         return jsonify({
             'error': 'Erro interno do servidor'
         }), 500
@@ -161,7 +161,7 @@ def alterar_dados_usuario(usuario_id):
             'error': str(e)
         }), 409
 
-    except Exception as e:
+    except Exception:
         return jsonify({
             'error': 'Erro interno do servidor'
         }), 500
