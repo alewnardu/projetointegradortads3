@@ -16,6 +16,5 @@ class IndicacaoRepository:
     @staticmethod
     def salvar(indicacao):
         db.session.add(indicacao)
-        db.session.commit()
 
         return indicacao

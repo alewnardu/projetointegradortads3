@@ -9,7 +9,7 @@ class Brinquedoteca(db.Model):
 
     observacao = db.Column(db.String(255), nullable=True)
 
-    status = db.Column(Enum('ATIVO', 'INATIVO', name="status_brinquedoteca_enum"), nullable=False, default='ATIVO')
+    status = db.Column(Enum('ATIVA', 'INATIVA', name="status_brinquedoteca_enum"), nullable=False, default='ATIVA')
 
     indicacao_id = db.Column(db.Integer, db.ForeignKey('indicacao.id'), nullable=False, unique=True)
 

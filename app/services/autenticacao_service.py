@@ -2,6 +2,7 @@ from flask import current_app
 from app.repositories.usuario_repository import UsuarioRepository
 from werkzeug.security import (check_password_hash, generate_password_hash)
 from app.exceptions import *
+from app.extensions import db
 from datetime import timedelta
 from flask_jwt_extended import create_access_token, decode_token
 from app.services.email_service import EmailService
@@ -75,9 +76,14 @@ class AutenticacaoService:
         if not usuario:
             raise ValidationError('Usuário não encontrado 6')
 
-        usuario.senha = generate_password_hash(nova_senha)
-        return UsuarioRepository.salvar(usuario)
-
+        try:
+            usuario.senha = generate_password_hash(nova_senha)
+            UsuarioRepository.salvar(usuario)
+            db.session.commit()
+            return usuario
+        except Exception:
+            db.session.rollback()
+            raise
     @staticmethod
     def alterar_senha(usuario_id, dados):
         
@@ -98,5 +104,11 @@ class AutenticacaoService:
         if nova_senha != confirmacao_senha:
             raise ValidationError('A nova senha e a confirmação não coincidem')
         
-        usuario.senha = generate_password_hash(nova_senha)
-        return UsuarioRepository.salvar(usuario)
+        try:
+            usuario.senha = generate_password_hash(nova_senha)
+            UsuarioRepository.salvar(usuario)
+            db.session.commit()
+            return usuario
+        except Exception:
+            db.session.rollback()
+            raise

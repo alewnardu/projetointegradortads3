@@ -18,7 +18,6 @@ class UsuarioRepository:
     @staticmethod
     def salvar(usuario):
         db.session.add(usuario)
-        db.session.commit()
 
         return usuario
 

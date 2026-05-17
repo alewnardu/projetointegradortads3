@@ -14,7 +14,6 @@ class BrinquedotecaRepository:
     @staticmethod
     def salvar(brinquedoteca):
         db.session.add(brinquedoteca)
-        db.session.commit()
 
         return brinquedoteca
 

@@ -21,7 +21,7 @@ def upgrade():
     op.create_table('brinquedoteca',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('observacao', sa.String(length=255), nullable=True),
-    sa.Column('status', sa.Enum('ATIVO', 'INATIVO', name='status_brinquedoteca_enum'), nullable=False),
+    sa.Column('status', sa.Enum('ATIVA', 'INATIVA', name='status_brinquedoteca_enum'), nullable=False),
     sa.Column('indicacao_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['indicacao_id'], ['indicacao.id'], ),
     sa.PrimaryKeyConstraint('id'),
