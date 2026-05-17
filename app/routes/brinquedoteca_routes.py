@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from app.schemas.brinquedoteca_schema import BrinquedotecaSchema
 from app.services.brinquedoteca_service import BrinquedotecaService
 from app.exceptions import *
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 brinquedoteca_bp = Blueprint('brinquedoteca_bp', __name__)
 
@@ -18,4 +19,30 @@ def listar_brinquedotecas():
     except Exception:
         return jsonify({
             'error': 'Erro interno do servidor'
+        }), 500
+
+@brinquedoteca_bp.route("/brinquedotecas/<int:brinquedoteca_id>/inativar", methods=['PATCH'])
+@jwt_required()
+def inativar_brinquedoteca(brinquedoteca_id):
+    try:
+        usuario_logado_id = get_jwt_identity()
+        BrinquedotecaService.inativar_brinquedoteca(usuario_logado_id, brinquedoteca_id)
+        return jsonify({
+            'message': 'Brinquedoteca inativada'
+        }), 200
+    except NotFoundError as e:
+        return jsonify({
+            'error': str(e)
+        }), 404
+    except UnauthorizedError as e:
+        return jsonify({
+            'error': str(e)
+        }), 401
+    except ForbiddenError as e:
+        return jsonify({
+            'error': str(e)
+        }), 403
+    except Exception as e:
+        return jsonify({
+            'error': 'Erro interno do servidor' + str(e)
         }), 500

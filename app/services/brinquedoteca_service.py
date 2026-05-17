@@ -2,12 +2,36 @@ from app.models.brinquedoteca import Brinquedoteca
 from app.repositories.brinquedoteca_repository import BrinquedotecaRepository
 from app.exceptions import *
 from app.extensions import db
+from app.repositories.usuario_repository import UsuarioRepository
 
 class BrinquedotecaService:
 
     @staticmethod
     def listar_brinquedotecas():
         return BrinquedotecaRepository.listar()
+
+    @staticmethod
+    def inativar_brinquedoteca(usuario_id, brinquedoteca_id):
+        brinquedoteca = BrinquedotecaRepository.buscar_por_id(brinquedoteca_id)
+
+        if not brinquedoteca:
+            raise NotFoundError('Brinquedoteca não encontrada')
+        
+        usuario_logado = UsuarioRepository.buscar_por_id(usuario_id)
+        if not usuario_logado:
+            raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')
+
+        if usuario_logado.perfil != 'ADMIN':
+            raise ForbiddenError('Acesso negado! Você não tem permissão para inativar brinquedotecas.')
+
+        try:
+            brinquedoteca.status = 'INATIVA'
+            brinquedoteca.observacao = 'A empresa encerrou os serviços junto à comunidade'
+            BrinquedotecaRepository.salvar(brinquedoteca)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
 
     @staticmethod
     def criar_brinquedoteca_por_indicacao(indicacao):
