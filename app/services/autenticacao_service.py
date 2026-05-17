@@ -7,6 +7,7 @@ from datetime import timedelta
 from flask_jwt_extended import create_access_token, decode_token
 from app.services.email_service import EmailService
 from jwt import ExpiredSignatureError
+from app.models.usuario import Usuario
 
 class AutenticacaoService:
 
@@ -28,6 +29,33 @@ class AutenticacaoService:
             raise AuthenticationError('Falha na autenticação')
 
         return usuario
+    
+    @staticmethod
+    def primeiro_acesso(dados):
+        try:
+            nome = dados.get('nome')
+            email = dados.get('email')
+            senha = dados.get('senha')
+            confirmacao_senha = dados.get('confirmacao_senha')
+
+            if UsuarioRepository.buscar_por_email(email):
+                raise ValidationError('Já existe um usuário cadastrado com este email')
+            
+            if senha != confirmacao_senha:
+                raise ValidationError('A senha e a confirmação de senha não coincidem')
+
+            senha_hash = generate_password_hash(senha)
+            usuario = Usuario(
+                nome=dados['nome'], 
+                email=dados['email'], 
+                senha=senha_hash
+            )
+            UsuarioRepository.salvar(usuario)
+            db.session.commit()
+            return usuario
+        except Exception:
+            db.session.rollback()
+            raise
     
     @staticmethod
     def recuperar_senha(dados):
