@@ -151,6 +151,38 @@ def cancelar_indicacao(indicacao_id):
         return jsonify({
             'error': 'Erro interno do servidor'
         }), 500
+
+@indicacao_bp.route("/indicacoes/<int:indicacao_id>/aprovar", methods=["PATCH"])
+@jwt_required()
+def aprovar_indicacao(indicacao_id):
+    try:
+        usuario_logado_id = get_jwt_identity()
+        indicacao = IndicacaoService.aprovar_indicacao(indicacao_id, usuario_logado_id)
+        return jsonify({
+            'success': True,
+            'message': 'Indicação aprovada',
+            'data': indicacao_schema.dump(indicacao)
+        }), 200
+    except UnauthorizedError as e:
+        return jsonify({
+            'error': str(e)
+        }), 401
+    except NotFoundError as e:
+        return jsonify({
+            'error': str(e)
+        }), 404
+    except ForbiddenError as e:
+        return jsonify({
+            'error': str(e)
+        }), 403
+    except BadRequestError as e:
+        return jsonify({
+            'error': str(e)
+        }), 400
+    except Exception:
+        return jsonify({
+            'error': 'Erro interno do servidor'
+        }), 500
     
 @indicacao_bp.route("/indicacoes/<int:indicacao_id>", methods=["PATCH"])
 @jwt_required()
