@@ -15,7 +15,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4NDU4NywianRpIjoiM2FmZjM1NjItYWU0NS00ZTcwLTk5MTAtYTAwZmVlYjNjN2Y0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODQ1ODcsImNzcmYiOiJhMjhkNTM0OS04NjFlLTQwYjEtODNiMS05MjU2MTdmMGU1ZDIiLCJleHAiOjE3Nzg4ODQ4ODd9.tQykabzTlFIMWCj4hbkEwSs5zOzFAYfju-j7LiPCqJw",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk2NTk3OSwianRpIjoiMGM5MTU1NGUtMzBlMS00ZjE2LTkzYjAtN2FmMTg2NGUxNGU1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg5NjU5NzksImNzcmYiOiJkNDYxYzVmNi0xYWNkLTQxOTEtYWUwNy02MGQ5Nzk0OGMyZWUiLCJleHAiOjE3Nzg5NjYyNzl9.y9IkrAhNYGeUVBDAO9jr1IOGAFo9hvULxiS0mgZwExE",
               "type": "string"
             }
           ]
@@ -40,7 +40,7 @@
       "response": []
     },
     {
-      "name": "/usuarios/id",
+      "name": "/usuarios/{id}",
       "protocolProfileBehavior": {
         "disableBodyPruning": true
       },
@@ -126,7 +126,7 @@
       "response": []
     },
     {
-      "name": "/usuarios/id",
+      "name": "/usuarios/{id}",
       "request": {
         "auth": {
           "type": "bearer",
@@ -168,7 +168,7 @@
       "response": []
     },
     {
-      "name": "/usuarios/id",
+      "name": "/usuarios/{id}",
       "request": {
         "auth": {
           "type": "bearer",
@@ -235,6 +235,37 @@
           "port": "5000",
           "path": [
             "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/primeiro-acesso",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"nome\": \"Wilkonys\",\r\n    \"email\": \"wilkonys@unitins.br\",\r\n    \"senha\": \"teste@123\",\r\n    \"confirmacao_senha\": \"teste@123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/primeiro-acesso",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "primeiro-acesso"
           ]
         }
       },
@@ -354,7 +385,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk0MzE3MywianRpIjoiZTM5ZDBmMjktYzExNy00ZDNiLThlYzgtNWI3N2U5MzBiNDZmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg5NDMxNzMsImNzcmYiOiJmNDc2ZDI1My0zMDE1LTQ4MDgtODYzNS1jNDQ2OGY3NDQ5MDgiLCJleHAiOjE3Nzg5NDM0NzN9.9ljyatSTPh3fAHXos9UT4KRJ5ivyTwbpmrkNKrGMn4M",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk2NTk3OSwianRpIjoiMGM5MTU1NGUtMzBlMS00ZjE2LTkzYjAtN2FmMTg2NGUxNGU1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg5NjU5NzksImNzcmYiOiJkNDYxYzVmNi0xYWNkLTQxOTEtYWUwNy02MGQ5Nzk0OGMyZWUiLCJleHAiOjE3Nzg5NjYyNzl9.y9IkrAhNYGeUVBDAO9jr1IOGAFo9hvULxiS0mgZwExE",
               "type": "string"
             }
           ]
@@ -383,11 +414,21 @@
       "response": []
     },
     {
-      "name": "/indicacoes/id",
+      "name": "/indicacoes/{id}",
       "protocolProfileBehavior": {
         "disableBodyPruning": true
       },
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk2NDM4MiwianRpIjoiNTYwYzhhZDAtYTBmMC00NWFlLWIxOTMtNjE1YzY5OTM5MDhhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjMiLCJuYmYiOjE3Nzg5NjQzODIsImNzcmYiOiJmOGI2OGIyZS0xMTQ3LTQ5NmYtYmMzOS1jZDc5OTllNzA4NDgiLCJleHAiOjE3Nzg5NjQ2ODJ9.LJ41r2CqotslWbD3p66_ikdDZH1sQp1YReTlOwPZjDg",
+              "type": "string"
+            }
+          ]
+        },
         "method": "GET",
         "header": [],
         "body": {
@@ -407,6 +448,290 @@
           "path": [
             "indicacoes",
             "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/indicacoes",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk1MjU4NywianRpIjoiOGZlY2I3MzUtMjI1ZC00NDNiLWJlZmUtOTE5ZWM3Yzg3MDA5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg5NTI1ODcsImNzcmYiOiI0OTk2ZGIxZi1mMWYzLTRmNzctYjI1NC1mYWVhM2VhZWJlOTgiLCJleHAiOjE3Nzg5NTI4ODd9.yWFBghfouItE60WoMS1N_VE9HWecVZIAyclFs6Vfw0U",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"descricao\": \"Teste do cadastro\",\r\n    \"nome\": \"Brinquedoteca de Teste\",\r\n    \"porte\": \"MEDIO\",\r\n    \"tem_climatizacao\": true,\r\n    \"tem_gratuidade\": true,\r\n    \"tem_monitores\": true\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/indicacoes",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "indicacoes"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/indicacoes/{id}/aprovar",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4NDI0MCwianRpIjoiNGRjOWE1MGItOGQ5YS00Yzc3LWE2ZTEtMGI4ZTFlOGUyZjE5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODQyNDAsImNzcmYiOiJjOTZkNzYxZi0xNDgzLTRiNDItOWM1Yy1iZWVhZGU0OTkwMzgiLCJleHAiOjE3Nzg4ODQ1NDB9.Xg8EAGeVuD8XUp-5wv2IAZWBFkpPbTZr8kT_LBt9gtc",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/indicacoes/3/aprovar",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "indicacoes",
+            "3",
+            "aprovar"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/indicacoes/{id}/cancelar",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4NDI0MCwianRpIjoiNGRjOWE1MGItOGQ5YS00Yzc3LWE2ZTEtMGI4ZTFlOGUyZjE5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODQyNDAsImNzcmYiOiJjOTZkNzYxZi0xNDgzLTRiNDItOWM1Yy1iZWVhZGU0OTkwMzgiLCJleHAiOjE3Nzg4ODQ1NDB9.Xg8EAGeVuD8XUp-5wv2IAZWBFkpPbTZr8kT_LBt9gtc",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/indicacoes/3/cancelar",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "indicacoes",
+            "3",
+            "cancelar"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/indicacoes/{id}/rejeitar",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk2NDIxMiwianRpIjoiNmYzNjdjODEtNjFjNi00MDk4LWFmZDEtZGJhZWQxYTc3YzNmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjMiLCJuYmYiOjE3Nzg5NjQyMTIsImNzcmYiOiIwZjI5NDY1MC00OWM4LTQxYzgtOThjYi00NGJmYmQ4MDE2Y2MiLCJleHAiOjE3Nzg5NjQ1MTJ9.W9aYbt_BJ1zhnXh7rIBSom4FdaVdpj1JAfm6TiYCQbM",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/indicacoes/6/rejeitar",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "indicacoes",
+            "6",
+            "rejeitar"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/indicacoes/{id}",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk2NzY2NywianRpIjoiZTUzYzY3YTEtN2I4MC00ZTVlLWI2MzEtZTJmNDE1MGE3ZDRhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg5Njc2NjcsImNzcmYiOiI2OWIyMDVlYS0zMDY2LTRlNDQtYTc5MC1lYmU1YjJhOTdjYWEiLCJleHAiOjE3Nzg5Njc5Njd9.be29IFQ88ZKn1GxKjsSmYz7FU31c8fC0QnTMz6D7IOI",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"descricao\": \"Espaço voltado para crianças de 3 a 10 anos.\",\r\n    \"nome\": \"Brinquedoteca Encanto Infantil\",\r\n    \"porte\": \"GRANDE\",\r\n    \"tem_climatizacao\": true,\r\n    \"tem_gratuidade\": true,\r\n    \"tem_monitores\": true\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/indicacoes/1",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "indicacoes",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/brinquedotecas",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": []
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/brinquedotecas",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "brinquedotecas"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/brinquedotecas/{id}/inativar",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk2NDIxMiwianRpIjoiNmYzNjdjODEtNjFjNi00MDk4LWFmZDEtZGJhZWQxYTc3YzNmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjMiLCJuYmYiOjE3Nzg5NjQyMTIsImNzcmYiOiIwZjI5NDY1MC00OWM4LTQxYzgtOThjYi00NGJmYmQ4MDE2Y2MiLCJleHAiOjE3Nzg5NjQ1MTJ9.W9aYbt_BJ1zhnXh7rIBSom4FdaVdpj1JAfm6TiYCQbM",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/brinquedotecas/6/inativar",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "brinquedotecas",
+            "6",
+            "inativar"
           ]
         }
       },

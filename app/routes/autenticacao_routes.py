@@ -2,9 +2,11 @@ from flask import Blueprint, request, jsonify
 from app.services.autenticacao_service import AutenticacaoService
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app.schemas.usuario_schema import UsuarioSchema
+from app.schemas.usuario_publico_schema import UsuarioPublicoSchema
 from app.exceptions import *
 
 usuario_schema = UsuarioSchema()
+usuario_publico_schema = UsuarioPublicoSchema()
 
 autenticacao_bp = Blueprint('autenticacao_bp', __name__)
 
@@ -42,6 +44,24 @@ def login():
     except Exception:
         return jsonify({
             'error': 'Erro interno do servidor'
+        }), 500
+
+@autenticacao_bp.route("/primeiro-acesso", methods=['POST'])
+def primeiro_acesso():
+    try:
+        dados = usuario_publico_schema.load(request.get_json())
+        AutenticacaoService.primeiro_acesso(dados)
+        return jsonify({
+            'success': True,
+            'message': 'Sua conta foi criada! Faça login para acessar o sistema'
+        }), 200
+    except ValidationError as e:
+        return jsonify({
+            'error': str(e)
+        }), 400
+    except Exception as e:
+        return jsonify({
+            'error': str(e)
         }), 500
 
 @autenticacao_bp.route('/recuperar-senha', methods=['POST'])
