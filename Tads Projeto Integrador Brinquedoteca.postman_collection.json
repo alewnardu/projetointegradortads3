@@ -87,11 +87,21 @@
     {
       "name": "/usuarios",
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3OTEzNzk3MiwianRpIjoiMWMwZGYwMDEtMmQ3Ny00YmMwLThiZDMtYzM0NjY4YjhiZjc1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzkxMzc5NzIsImNzcmYiOiIxZWE2ODA5YS01NzJlLTRkNTktYWFiOC0xM2NiYjA1ZTJkNzAiLCJleHAiOjE3NzkxMzgyNzJ9.aJYlXIxukjO6PRwFU_ICiO_-xD1S5NdouMvbG4-sFpk",
+              "type": "string"
+            }
+          ]
+        },
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"nome\": \"Leonardo Araujo\",\r\n    \"email\": \"leonardoaraujo@unitins.br\",\r\n    \"senha\": \"teste@123\",\r\n    \"confirmacao_senha\": \"teste@123\",\r\n    \"perfil\": \"ADMIN\"\r\n}",
+          "raw": "{\r\n    \"nome\": \"Aquiles Rodrigues\",\r\n    \"email\": \"aquilesrodriques@unitins.brs\",\r\n    \"senha\": \"teste@123\",\r\n    \"confirmacao_senha\": \"teste@123\",\r\n    \"perfil\": \"ADMsIN\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -123,7 +133,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4NDI0MCwianRpIjoiNGRjOWE1MGItOGQ5YS00Yzc3LWE2ZTEtMGI4ZTFlOGUyZjE5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODQyNDAsImNzcmYiOiJjOTZkNzYxZi0xNDgzLTRiNDItOWM1Yy1iZWVhZGU0OTkwMzgiLCJleHAiOjE3Nzg4ODQ1NDB9.Xg8EAGeVuD8XUp-5wv2IAZWBFkpPbTZr8kT_LBt9gtc",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3OTEzNzk3MiwianRpIjoiMWMwZGYwMDEtMmQ3Ny00YmMwLThiZDMtYzM0NjY4YjhiZjc1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzkxMzc5NzIsImNzcmYiOiIxZWE2ODA5YS01NzJlLTRkNTktYWFiOC0xM2NiYjA1ZTJkNzAiLCJleHAiOjE3NzkxMzgyNzJ9.aJYlXIxukjO6PRwFU_ICiO_-xD1S5NdouMvbG4-sFpk",
               "type": "string"
             }
           ]
@@ -237,7 +247,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"nome\": \"Wilkonys\",\r\n    \"email\": \"wilkonys@unitins.br\",\r\n    \"senha\": \"teste@123\",\r\n    \"confirmacao_senha\": \"teste@123\"\r\n}",
+          "raw": "{\r\n    \"nome\": \"Wendell\",\r\n    \"email\": \"q1wendell@unitins.br\",\r\n    \"senha\": \"teste@123\",\r\n    \"confirmacao_senha\": \"teste@123\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
