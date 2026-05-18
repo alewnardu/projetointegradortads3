@@ -1,4 +1,5 @@
 from marshmallow import Schema, fields, validate
+from app.schemas.endereco_schema import EnderecoSchema
 
 class IndicacaoSchema(Schema):
 
@@ -34,3 +35,5 @@ class IndicacaoSchema(Schema):
     usuario_indicador_id = fields.Integer(dump_only=True)
 
     usuario_analisador_id = fields.Integer(dump_only=True)
+
+    endereco = fields.Nested(EnderecoSchema, required=True)

@@ -5,6 +5,11 @@ from app.repositories.usuario_repository import UsuarioRepository
 from datetime import datetime
 from app.services.brinquedoteca_service import BrinquedotecaService
 from app.extensions import db
+from app.models.endereco import Endereco
+from app.repositories.endereco_repository import EnderecoRepository
+from app.services.endereco_service import EnderecoService
+from app.services.localizacao_service import LocalizacaoService
+from app.repositories.localizacao_repository import LocalizacaoRepository
 
 class IndicacaoService:
 
@@ -51,10 +56,36 @@ class IndicacaoService:
             raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')        
         
         try:
-            indicacao = Indicacao(**dados, usuario_indicador=usuario_logado)
+            endereco_dados = dados.pop('endereco')
+            localizacao_dados = endereco_dados.pop('localizacao')
+
+            indicacao = Indicacao(
+                **dados,
+                usuario_indicador=usuario_logado
+            )
+
             IndicacaoRepository.salvar(indicacao)
+            db.session.flush()
+
+            endereco = EnderecoService.criar_endereco_por_indicacao(
+                indicacao,
+                endereco_dados
+            )
+
+            EnderecoRepository.salvar(endereco)
+            db.session.flush()
+
+            localizacao = LocalizacaoService.criar_localizacao_por_endereco(
+                endereco,
+                localizacao_dados
+            )
+
+            LocalizacaoRepository.salvar(localizacao)
+
             db.session.commit()
-            return indicacao
+
+            return IndicacaoRepository.buscar_por_id(indicacao.id)
+
         except Exception:
             db.session.rollback()
             raise

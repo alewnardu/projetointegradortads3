@@ -9,7 +9,7 @@ class BrinquedotecaRepository:
 
     @staticmethod
     def buscar_por_id(brinquedoteca_id):
-        return Brinquedoteca.query.get(brinquedoteca_id)
+        return db.session.get(Brinquedoteca, brinquedoteca_id)
 
     @staticmethod
     def salvar(brinquedoteca):
