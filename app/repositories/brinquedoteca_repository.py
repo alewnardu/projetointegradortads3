@@ -20,4 +20,3 @@ class BrinquedotecaRepository:
     @staticmethod
     def deletar(brinquedoteca):
         db.session.delete(brinquedoteca)
-        db.session.commit()

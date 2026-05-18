@@ -4,9 +4,11 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from app.schemas.usuario_schema import UsuarioSchema
 from app.schemas.usuario_publico_schema import UsuarioPublicoSchema
 from app.exceptions import *
+from app.schemas.login_schema import LoginSchema
 
 usuario_schema = UsuarioSchema()
 usuario_publico_schema = UsuarioPublicoSchema()
+login_schema = LoginSchema()
 
 autenticacao_bp = Blueprint('autenticacao_bp', __name__)
 
@@ -14,7 +16,7 @@ autenticacao_bp = Blueprint('autenticacao_bp', __name__)
 def login():
 
     try:
-        dados = request.get_json()
+        dados = login_schema.load(request.get_json())
 
         usuario = AutenticacaoService.autenticar_usuario(dados)
         
@@ -29,21 +31,13 @@ def login():
                 'perfil': usuario.perfil
             }
         }), 200
-    except NotFoundError as e:
-        return jsonify({
-            'error': str(e)
-        }), 404
     except AuthenticationError as e:
         return jsonify({
             'error': str(e)
         }), 401
-    except ValidationError as e:
+    except Exception as e:
         return jsonify({
-            'error': str(e)
-        }), 400
-    except Exception:
-        return jsonify({
-            'error': 'Erro interno do servidor'
+            'error': f'Erro interno do servidor: {str(e)}'
         }), 500
 
 @autenticacao_bp.route("/primeiro-acesso", methods=['POST'])

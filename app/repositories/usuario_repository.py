@@ -25,4 +25,3 @@ class UsuarioRepository:
     @staticmethod
     def deletar(usuario):
         db.session.delete(usuario)
-        db.session.commit()
