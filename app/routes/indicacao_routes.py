@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.schemas.indicacao_schema import IndicacaoSchema
+from app.schemas.indicacao_update_schema import IndicacaoUpdateSchema
 from app.services.indicacao_service import IndicacaoService
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.exceptions import *
@@ -9,6 +10,7 @@ indicacao_bp = Blueprint('indicacao_bp', __name__)
 
 indicacao_schema = IndicacaoSchema()
 indicacoes_schema = IndicacaoSchema(many=True)
+indicacao_update_schema = IndicacaoUpdateSchema()
 
 @indicacao_bp.route('/indicacoes', methods=['GET'])
 @jwt_required()
@@ -188,7 +190,7 @@ def aprovar_indicacao(indicacao_id):
 @jwt_required()
 def atualizar_indicacao(indicacao_id):
     try:
-        dados = indicacao_schema.load(request.get_json(), partial=True)
+        dados = indicacao_update_schema.load(request.get_json(), partial=True)
         usuario_logado_id = get_jwt_identity()
         indicacao = IndicacaoService.atualizar_indicacao(indicacao_id, usuario_logado_id, dados)
         

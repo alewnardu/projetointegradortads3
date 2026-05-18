@@ -203,9 +203,29 @@ class IndicacaoService:
             raise BadRequestError(f'Não é possível atualizar uma indicação com status {indicacao.status}')
 
         try:
+            endereco_dados = dados.pop('endereco', None)
             for key, value in dados.items():
                 setattr(indicacao, key, value)
-            IndicacaoRepository.salvar(indicacao)
+            
+            if endereco_dados:
+                localizacao_dados = endereco_dados.pop('localizacao', None)
+
+                if not indicacao.endereco:
+                    raise NotFoundError('Endereço não encontrado')
+
+                endereco_atual = indicacao.endereco
+                for key, value in endereco_dados.items():
+                    setattr(endereco_atual, key, value)
+                
+                if localizacao_dados:
+
+                    if not endereco_atual.localizacao:
+                        raise NotFoundError('Localização não encontrada')
+                    
+                    localizacao_atual = endereco_atual.localizacao
+                    for key, value in localizacao_dados.items():
+                        setattr(localizacao_atual, key, value)
+
             db.session.commit()
             return indicacao
         except Exception:
