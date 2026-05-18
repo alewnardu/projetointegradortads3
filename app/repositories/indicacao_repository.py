@@ -11,7 +11,7 @@ class IndicacaoRepository:
     
     @staticmethod
     def buscar_por_id(indicacao_id):
-        return Indicacao.query.get(indicacao_id)
+        return db.session.get(Indicacao, indicacao_id)
 
     @staticmethod
     def salvar(indicacao):

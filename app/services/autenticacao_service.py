@@ -13,38 +13,31 @@ class AutenticacaoService:
 
     @staticmethod
     def autenticar_usuario(dados):
-        email = dados.get('email')
-        senha = dados.get('senha')
 
-        if not all([email, senha]):
-            raise ValidationError('Email e senha são obrigatórios')
-        
-        usuario = UsuarioRepository.buscar_por_email(email)
+        usuario = UsuarioRepository.buscar_por_email(
+            dados['email']
+        )
 
         if not usuario:
-            raise NotFoundError('Credendiais inválidas')
+            raise AuthenticationError('Credenciais inválidas')
         
-        senha_valida = check_password_hash(usuario.senha, senha)
+        senha_valida = check_password_hash(
+            usuario.senha,
+            dados['senha']
+        )
+
         if not senha_valida:
-            raise AuthenticationError('Falha na autenticação')
+            raise AuthenticationError('Credenciais inválidas')
 
         return usuario
     
     @staticmethod
     def primeiro_acesso(dados):
         try:
-            nome = dados.get('nome')
-            email = dados.get('email')
-            senha = dados.get('senha')
-            confirmacao_senha = dados.get('confirmacao_senha')
-
-            if UsuarioRepository.buscar_por_email(email):
-                raise ValidationError('Já existe um usuário cadastrado com este email')
+            if UsuarioRepository.buscar_por_email(dados['email']):
+                raise ValidationError(f'Já existe um usuário cadastrado com o email {dados['email']}')
             
-            if senha != confirmacao_senha:
-                raise ValidationError('A senha e a confirmação de senha não coincidem')
-
-            senha_hash = generate_password_hash(senha)
+            senha_hash = generate_password_hash(dados['senha'])
             usuario = Usuario(
                 nome=dados['nome'], 
                 email=dados['email'], 

@@ -3,6 +3,7 @@ from app.schemas.usuario_schema import UsuarioSchema
 from app.services.usuario_service import UsuarioService
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.exceptions import *
+from marshmallow import ValidationError as MarshmallowValidationError
 
 usuario_bp = Blueprint('usuario_bp', __name__)
 
@@ -68,7 +69,7 @@ def buscar_usuario(usuario_id):
 def criar_usuario():
     
     try:
-        dados = request.get_json()
+        dados = usuario_schema.load(request.get_json())
         usuario_logado_id = get_jwt_identity()
         usuario = UsuarioService.criar_usuario(usuario_logado_id, dados)
         
@@ -92,15 +93,17 @@ def criar_usuario():
         return jsonify({
             'error': str(e)
         }), 400
-    
+    except MarshmallowValidationError as e:
+        return jsonify({
+            'error': str(e)
+        }), 400
     except EmailAlreadyExistsError as e:
         return jsonify({
             'error': str(e)
         }), 409
-    
     except Exception:
         return jsonify({
-            'error': 'Erro interno do servidor'
+            'error': "Erro interno do servidor"
         }), 500
 
 @usuario_bp.route('/usuarios/<int:usuario_id>', methods=['DELETE'])
