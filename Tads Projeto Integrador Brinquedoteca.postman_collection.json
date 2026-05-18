@@ -15,7 +15,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk2NTk3OSwianRpIjoiMGM5MTU1NGUtMzBlMS00ZjE2LTkzYjAtN2FmMTg2NGUxNGU1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg5NjU5NzksImNzcmYiOiJkNDYxYzVmNi0xYWNkLTQxOTEtYWUwNy02MGQ5Nzk0OGMyZWUiLCJleHAiOjE3Nzg5NjYyNzl9.y9IkrAhNYGeUVBDAO9jr1IOGAFo9hvULxiS0mgZwExE",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk4OTA2MCwianRpIjoiNTBkMzkzOTUtNWZmNy00ZmU4LTk3NDgtZjhiMmRmNzBhNjJiIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg5ODkwNjAsImNzcmYiOiJiYzlmOTZhYi02NTQ1LTQyMjktODBjNS0wZDg0MzUwYTY2ZGUiLCJleHAiOjE3Nzg5ODkzNjB9.HIoMM8zdCsREXmo_zH8xS6l2B5XbUNpPLzCxUaR6wwQ",
               "type": "string"
             }
           ]
@@ -87,21 +87,11 @@
     {
       "name": "/usuarios",
       "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4Mzg4OSwianRpIjoiZTU5YjEzOTAtMzA4MC00Y2QwLThjNzUtZDIzZDk3N2RjYWYzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODM4ODksImNzcmYiOiJkOTk2YjE4Zi00NWFjLTQxOGEtODNkYy1jYmY2ODIyNTA2MTUiLCJleHAiOjE3Nzg4ODQxODl9.r5WrtIAO-fZiXzQ3WBsgC9Od_TxxOOHtBlQaUfS_yKU",
-              "type": "string"
-            }
-          ]
-        },
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"nome\": \"Wendel\",\r\n    \"email\": \"wendel@unitins.br\",\r\n    \"senha\": \"teste@123\",\r\n    \"confirmacao_senha\": \"teste@123\",\r\n    \"perfil\": \"ADMIN\"\r\n}",
+          "raw": "{\r\n    \"nome\": \"Leonardo Araujo\",\r\n    \"email\": \"leonardoaraujo@unitins.br\",\r\n    \"senha\": \"teste@123\",\r\n    \"confirmacao_senha\": \"teste@123\",\r\n    \"perfil\": \"ADMIN\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -385,7 +375,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk2NTk3OSwianRpIjoiMGM5MTU1NGUtMzBlMS00ZjE2LTkzYjAtN2FmMTg2NGUxNGU1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg5NjU5NzksImNzcmYiOiJkNDYxYzVmNi0xYWNkLTQxOTEtYWUwNy02MGQ5Nzk0OGMyZWUiLCJleHAiOjE3Nzg5NjYyNzl9.y9IkrAhNYGeUVBDAO9jr1IOGAFo9hvULxiS0mgZwExE",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk4MTgyMywianRpIjoiODQ1MmU5ZTAtZGIxNS00ZDdjLWIxNjQtZTYzMjg5NWU1NTcwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg5ODE4MjMsImNzcmYiOiJhZGQyZDgzMy02NTg5LTQ4YTQtYWIwMS03Zjg0NGQ4MTY1M2YiLCJleHAiOjE3Nzg5ODIxMjN9.VxU7lwk4J_6XgEVWnoOJC8pXn4rNina9PoSyCTeYSeo",
               "type": "string"
             }
           ]
@@ -424,7 +414,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk2NDM4MiwianRpIjoiNTYwYzhhZDAtYTBmMC00NWFlLWIxOTMtNjE1YzY5OTM5MDhhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjMiLCJuYmYiOjE3Nzg5NjQzODIsImNzcmYiOiJmOGI2OGIyZS0xMTQ3LTQ5NmYtYmMzOS1jZDc5OTllNzA4NDgiLCJleHAiOjE3Nzg5NjQ2ODJ9.LJ41r2CqotslWbD3p66_ikdDZH1sQp1YReTlOwPZjDg",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3OTAzMzUxOSwianRpIjoiZjRkNmQ5NDAtNmE4MC00N2Q5LWJlYTItNGUxMjdkYTA1OTUwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzkwMzM1MTksImNzcmYiOiI2NzM3NDEyNC1jNmQ3LTRkOTUtYWMzZS1kZWQ5NWY4ZGZlMmQiLCJleHAiOjE3NzkwMzM4MTl9.4JmF7iY1rdWASSLwiK-G6FzXbbqz0cupu3qvGL5WCK8",
               "type": "string"
             }
           ]
@@ -436,7 +426,7 @@
           "formdata": []
         },
         "url": {
-          "raw": "http://127.0.0.1:5000/indicacoes/1",
+          "raw": "http://127.0.0.1:5000/indicacoes/4",
           "protocol": "http",
           "host": [
             "127",
@@ -447,7 +437,7 @@
           "port": "5000",
           "path": [
             "indicacoes",
-            "1"
+            "4"
           ]
         }
       },
@@ -461,7 +451,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk1MjU4NywianRpIjoiOGZlY2I3MzUtMjI1ZC00NDNiLWJlZmUtOTE5ZWM3Yzg3MDA5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg5NTI1ODcsImNzcmYiOiI0OTk2ZGIxZi1mMWYzLTRmNzctYjI1NC1mYWVhM2VhZWJlOTgiLCJleHAiOjE3Nzg5NTI4ODd9.yWFBghfouItE60WoMS1N_VE9HWecVZIAyclFs6Vfw0U",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3OTAyOTE3NiwianRpIjoiZjEzZDk4YjAtODcxOS00Mjk3LWE2MDYtYmQzMDM0MzY4YmYyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzkwMjkxNzYsImNzcmYiOiJiMDAxOGU3OS0zMThkLTQ2YTItOTk5YS0yNDBmZjcwMWExZDYiLCJleHAiOjE3NzkwMjk0NzZ9.HQ3mJPt55BltyqAYxyx9hhswaAiHzWEnl2BFyoirRj8",
               "type": "string"
             }
           ]
@@ -470,7 +460,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"descricao\": \"Teste do cadastro\",\r\n    \"nome\": \"Brinquedoteca de Teste\",\r\n    \"porte\": \"MEDIO\",\r\n    \"tem_climatizacao\": true,\r\n    \"tem_gratuidade\": true,\r\n    \"tem_monitores\": true\r\n}",
+          "raw": "{\r\n    \"descricao\": \"Teste Indicação Com Endereco\",\r\n    \"nome\": \"Brinquedoteca de Teste 2\",\r\n    \"porte\": \"PEQUENO\",\r\n    \"tem_climatizacao\": true,\r\n    \"tem_gratuidade\": true,\r\n    \"tem_monitores\": true,\r\n    \"endereco\": {\r\n        \"logradouro\": \"Rua A\",\r\n        \"numero\": \"123\",\r\n        \"bairro\": \"Centro\",\r\n        \"cidade\": \"Palmas\",\r\n        \"estado\": \"TO\",\r\n        \"cep\": \"77001402\"\r\n    }\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -502,7 +492,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODg4NDI0MCwianRpIjoiNGRjOWE1MGItOGQ5YS00Yzc3LWE2ZTEtMGI4ZTFlOGUyZjE5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg4ODQyNDAsImNzcmYiOiJjOTZkNzYxZi0xNDgzLTRiNDItOWM1Yy1iZWVhZGU0OTkwMzgiLCJleHAiOjE3Nzg4ODQ1NDB9.Xg8EAGeVuD8XUp-5wv2IAZWBFkpPbTZr8kT_LBt9gtc",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk4MzI5MCwianRpIjoiNTlhM2Y1ZDktMmM1My00ZTVmLTgyMmYtMDM4MWVjMzBjOGYyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg5ODMyOTAsImNzcmYiOiJmNTBlODhhZS04MDk5LTQyMDktOTk2Ni1hZjhjNDA0ZmFlNjYiLCJleHAiOjE3Nzg5ODM1OTB9.hat55rnlB8hHLe9XLpeuxn2Q1FJP1D4l0Gw8v_e2okA",
               "type": "string"
             }
           ]
@@ -519,7 +509,7 @@
           }
         },
         "url": {
-          "raw": "http://127.0.0.1:5000/indicacoes/3/aprovar",
+          "raw": "http://127.0.0.1:5000/indicacoes/1/aprovar",
           "protocol": "http",
           "host": [
             "127",
@@ -530,7 +520,7 @@
           "port": "5000",
           "path": [
             "indicacoes",
-            "3",
+            "1",
             "aprovar"
           ]
         }
@@ -702,7 +692,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk2NDIxMiwianRpIjoiNmYzNjdjODEtNjFjNi00MDk4LWFmZDEtZGJhZWQxYTc3YzNmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjMiLCJuYmYiOjE3Nzg5NjQyMTIsImNzcmYiOiIwZjI5NDY1MC00OWM4LTQxYzgtOThjYi00NGJmYmQ4MDE2Y2MiLCJleHAiOjE3Nzg5NjQ1MTJ9.W9aYbt_BJ1zhnXh7rIBSom4FdaVdpj1JAfm6TiYCQbM",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3ODk4NjU1MCwianRpIjoiZmJmMmRmNzYtMTExOC00NTU2LTk5MzEtYjExNjQwZDkzODMzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3Nzg5ODY1NTAsImNzcmYiOiI1NzgxMTE4Yi03ODgxLTQyOTctOGIyMS02OGVkZjYzMTU0NjAiLCJleHAiOjE3Nzg5ODY4NTB9.ExaYiPyW-Akj9ggrXe714DFjB0pqsd2UtpZbnrJ3Dvk",
               "type": "string"
             }
           ]
@@ -719,7 +709,7 @@
           }
         },
         "url": {
-          "raw": "http://127.0.0.1:5000/brinquedotecas/6/inativar",
+          "raw": "http://127.0.0.1:5000/brinquedotecas/1/inativar",
           "protocol": "http",
           "host": [
             "127",
@@ -730,7 +720,7 @@
           "port": "5000",
           "path": [
             "brinquedotecas",
-            "6",
+            "1",
             "inativar"
           ]
         }
