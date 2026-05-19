@@ -461,7 +461,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3OTE0NjAyMywianRpIjoiMWEzOGRiODItZDllZC00ZDdhLWI5MzktMmYzZDk3M2RiMDY3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzkxNDYwMjMsImNzcmYiOiIyNGVkNWFmMS1mMWFlLTQyZmQtYjhiOS1lZWE0MWQyOGJmMDEiLCJleHAiOjE3NzkxNDYzMjN9.9MBZ_UbST87NHM70tjrQ90gJvOXGyIQpuOAwbQU3L_Q",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3OTIxNjMyNywianRpIjoiMzFiOTAwYzAtODk2ZC00MDU3LTgwOGUtMDQ5MmE3NDM5NTRkIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NzkyMTYzMjcsImNzcmYiOiJmZjM2ZGFiMy1iOGNjLTQ1MWYtOGQzNC00MTQxYjUzZDA3NTMiLCJleHAiOjE3NzkyMTY2Mjd9.Iga_T06NKPU-RbeCwSTGjNSnnm9iv3VD1JPfVgbaq2A",
               "type": "string"
             }
           ]
@@ -469,13 +469,21 @@
         "method": "POST",
         "header": [],
         "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"descricao\": \"Teste Indicação LOCALIZACAO\",\r\n    \"nome\": \"Brinquedoteca de Teste 1\",\r\n    \"porte\": \"PEQUENO\",\r\n    \"tem_climatizacao\": true,\r\n    \"tem_gratuidade\": true,\r\n    \"tem_monitores\": true,\r\n    \"endereco\": {\r\n        \"logradouro\": \"Rua A\",\r\n        \"numero\": \"123\",\r\n        \"bairro\": \"Centro\",\r\n        \"cidade\": \"Palmas\",\r\n        \"estado\": \"TO\",\r\n        \"cep\": \"77001402\",\r\n        \"localizacao\": {\r\n            \"latitude\": -10.1689,\r\n            \"longitude\": -48.3317\r\n        }\r\n   }\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "dados",
+              "type": "text",
+              "uuid": "b5626105-4653-46d1-9577-3bc585d4b1c2",
+              "value": "{\n    \"descricao\": \"Teste Indicação LOCALIZACAO\",\n    \"nome\": \"Brinquedoteca de Teste 1\",\n    \"porte\": \"PEQUENO\",\n    \"tem_climatizacao\": true,\n    \"tem_gratuidade\": true,\n    \"tem_monitores\": true,\n    \"endereco\": {\n        \"logradouro\": \"Rua A\",\n        \"numero\": \"123\",\n        \"bairro\": \"Centro\",\n        \"cidade\": \"Palmas\",\n        \"estado\": \"TO\",\n        \"cep\": \"77001402\",\n        \"localizacao\": {\n            \"latitude\": -10.1689,\n            \"longitude\": -48.3317\n        }\n   }\n}"
+            },
+            {
+              "key": "foto_principal",
+              "type": "file",
+              "uuid": "28e3a256-d5fa-4828-9d78-25388e6067cf",
+              "src": "/C:/Users/Leonardo Araújo/Pictures/logo-saspp.png"
             }
-          }
+          ]
         },
         "url": {
           "raw": "http://127.0.0.1:5000/indicacoes",

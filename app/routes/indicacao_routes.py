@@ -5,6 +5,7 @@ from app.services.indicacao_service import IndicacaoService
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.exceptions import *
 from marshmallow import ValidationError as MarshmallowValidationError
+import json
 
 indicacao_bp = Blueprint('indicacao_bp', __name__)
 
@@ -64,9 +65,22 @@ def buscar_indicacao(indicacao_id):
 @jwt_required()
 def criar_indicacao():
     try:
-        dados = indicacao_schema.load(request.get_json())
+        dados = json.loads(request.form.get('dados'))
+
+        dados = indicacao_schema.load(dados)
+
+        foto_principal = request.files.get('foto_principal')
+
+        fotos_adicionais = request.files.getlist('fotos_adicionais')
+
         usuario_logado_id = get_jwt_identity()
-        indicacao = IndicacaoService.criar_indicacao(usuario_logado_id, dados)
+        
+        indicacao = IndicacaoService.criar_indicacao(
+            usuario_logado_id, 
+            dados,
+            foto_principal,
+            fotos_adicionais
+        )
         
         return jsonify({
             'success': True,
