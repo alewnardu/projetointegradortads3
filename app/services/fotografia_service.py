@@ -6,6 +6,9 @@ import uuid
 from werkzeug.utils import secure_filename
 from app.repositories.fotografia_repository import FotografiaRepository
 from datetime import datetime
+from app.exceptions import *
+from app.repositories.usuario_repository import UsuarioRepository
+from app.repositories.indicacao_repository import IndicacaoRepository
 
 UPLOAD_FOLDER = 'uploads/indicacoes'
 
@@ -34,6 +37,44 @@ class FotografiaService:
             FotografiaRepository.salvar(fotografia)
             
             return fotografia
+        except Exception:
+            db.session.rollback()
+            raise
+    
+    @staticmethod
+    def deletar_fotografia(usuario_logado_id, indicacao_id, fotografia_id):
+        try:
+            if not usuario_logado_id:
+                raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')
+
+            usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+            if not usuario_logado:
+                raise NotFoundError('Usuário não encontrado')
+
+            indicacao = IndicacaoRepository.buscar_por_id(indicacao_id)
+            if not indicacao:
+                raise NotFoundError('Indicação de brinquedoteca não encontrada')
+
+            fotografia = FotografiaRepository.buscar_por_id(fotografia_id)
+            if not fotografia:
+                raise NotFoundError('Registro fotográfico não encontrado')
+            
+            if fotografia.indicacao_id != indicacao_id:
+                raise ForbiddenError('A fotografia não pertence à indicação de brinquedoteca informada.')
+
+            if usuario_logado.perfil != 'ADMIN':
+                raise ForbiddenError('Acesso negado: Você não tem permissão para apagar registros fotográficos')
+            
+            if fotografia.is_principal and FotografiaRepository.total_fotografias_por_indicacao(indicacao_id, is_principal=True) <= 1:
+                raise ValidationError("Não é permitido remover a única fotografia principal da indicação.")
+
+            if fotografia.caminho and os.path.exists(fotografia.caminho):
+                os.remove(fotografia.caminho)
+
+            FotografiaRepository.deletar(fotografia)
+            db.session.commit()
+
+            return True
         except Exception:
             db.session.rollback()
             raise
