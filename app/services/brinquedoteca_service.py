@@ -11,7 +11,7 @@ class BrinquedotecaService:
         return BrinquedotecaRepository.listar()
 
     @staticmethod
-    def inativar_brinquedoteca(usuario_id, brinquedoteca_id):
+    def inativar_brinquedoteca(usuario_id, brinquedoteca_id, dados):
         brinquedoteca = BrinquedotecaRepository.buscar_por_id(brinquedoteca_id)
 
         if not brinquedoteca:
@@ -24,11 +24,16 @@ class BrinquedotecaService:
         if usuario_logado.perfil != 'ADMIN':
             raise ForbiddenError('Acesso negado! Você não tem permissão para inativar brinquedotecas.')
 
+        if brinquedoteca.status != "ATIVA":
+            raise BadRequestError(f'Não é possível inativar uma brinquedoteca com status {brinquedoteca.status}')
+
         try:
             brinquedoteca.status = 'INATIVA'
-            brinquedoteca.observacao = 'A empresa encerrou os serviços junto à comunidade'
+            brinquedoteca.observacao = dados['observacao']
             BrinquedotecaRepository.salvar(brinquedoteca)
+            
             db.session.commit()
+            return brinquedoteca
         except Exception:
             db.session.rollback()
             raise

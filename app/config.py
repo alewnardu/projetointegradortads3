@@ -19,9 +19,16 @@ class Config:
 
     LOCAL_APP_URL = os.getenv('LOCAL_APP_URL', 'http://localhost:5000')
     
+    MAX_CONTENT_LENGTH = 5 * 1024 * 1024
+
     UPLOAD_FOLDER = 'uploads'
 
-    MAX_CONTENT_LENGTH = 5 * 1024 * 1024
+    ALLOWED_EXTENSIONS = {
+        'png',
+        'jpg',
+        'jpeg',
+        'webp'
+    }
 
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
 

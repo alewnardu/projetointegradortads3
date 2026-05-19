@@ -43,3 +43,8 @@ class Indicacao(db.Model):
         backref='indicacoes_analisadas'
     )
     
+    fotografias = db.relationship(
+        'Fotografia',
+        back_populates='indicacao',
+        cascade='all, delete-orphan'
+    )

@@ -10,6 +10,7 @@ from app.repositories.endereco_repository import EnderecoRepository
 from app.services.endereco_service import EnderecoService
 from app.services.localizacao_service import LocalizacaoService
 from app.repositories.localizacao_repository import LocalizacaoRepository
+from app.services.fotografia_service import FotografiaService
 
 class IndicacaoService:
 
@@ -48,7 +49,7 @@ class IndicacaoService:
         return indicacao
 
     @staticmethod
-    def criar_indicacao(usuario_logado_id, dados):
+    def criar_indicacao(usuario_logado_id, dados, foto_principal, fotos_adicionais):
         
         usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
 
@@ -59,28 +60,22 @@ class IndicacaoService:
             endereco_dados = dados.pop('endereco')
             localizacao_dados = endereco_dados.pop('localizacao')
 
-            indicacao = Indicacao(
-                **dados,
-                usuario_indicador=usuario_logado
-            )
-
+            indicacao = Indicacao(**dados, usuario_indicador=usuario_logado)
             IndicacaoRepository.salvar(indicacao)
             db.session.flush()
 
-            endereco = EnderecoService.criar_endereco_por_indicacao(
-                indicacao,
-                endereco_dados
-            )
-
+            endereco = EnderecoService.criar_endereco_por_indicacao(indicacao, endereco_dados)
             EnderecoRepository.salvar(endereco)
             db.session.flush()
 
-            localizacao = LocalizacaoService.criar_localizacao_por_endereco(
-                endereco,
-                localizacao_dados
-            )
-
+            localizacao = LocalizacaoService.criar_localizacao_por_endereco(endereco, localizacao_dados)
             LocalizacaoRepository.salvar(localizacao)
+
+            if foto_principal:
+                FotografiaService.criar_fotografia_por_indicacao(indicacao, foto_principal, is_principal=True)
+
+            for foto in fotos_adicionais:
+                FotografiaService.criar_fotografia_por_indicacao(indicacao, foto, is_principal=False)
 
             db.session.commit()
 
