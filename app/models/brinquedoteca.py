@@ -18,5 +18,6 @@ class Brinquedoteca(db.Model):
     avaliacoes = db.relationship(
         "Avaliacao",
         back_populates="brinquedoteca",
-        cascade='all, delete-orphan'
+        cascade='all, delete-orphan',
+        order_by="desc(Avaliacao.data_avaliacao)"
     )
