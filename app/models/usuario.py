@@ -14,3 +14,8 @@ class Usuario(db.Model):
     senha = db.Column(db.String(255), nullable=False)
     
     perfil = db.Column(Enum('CIDADAO', 'ADMIN', name="perfil_usuario_enum"), nullable=False, default='CIDADAO')
+
+    avaliacoes = db.relationship(
+        'Avaliacao',
+        back_populates='usuario_avaliador'
+    )

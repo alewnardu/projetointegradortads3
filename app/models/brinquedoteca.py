@@ -14,3 +14,9 @@ class Brinquedoteca(db.Model):
     indicacao_id = db.Column(db.Integer, db.ForeignKey('indicacao.id'), nullable=False, unique=True)
 
     indicacao = db.relationship('Indicacao', backref=db.backref('brinquedoteca', uselist=False))
+
+    avaliacoes = db.relationship(
+        "Avaliacao",
+        back_populates="brinquedoteca",
+        cascade='all, delete-orphan'
+    )
