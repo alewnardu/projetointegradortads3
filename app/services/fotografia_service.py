@@ -18,30 +18,29 @@ class FotografiaService:
     @staticmethod
     def criar_fotografia_por_indicacao(indicacao, fotografia_aquivo, is_principal=False):
         try:
-            if is_principal:
-
-            total_principais = (
-                FotografiaRepository
-                .total_fotografias_por_indicacao(
-                    indicacao.id,
-                    is_principal=True
-                )
-            )
-
-            if total_principais > 0:
-                raise ValidationError('A indicação deve conter apenas uma fotografia principal.')
             
             nome_original = secure_filename(fotografia_aquivo.filename)
             if not nome_original:
                 raise ValidationError('Nome de arquivo inválido.')
+
+            if '.' not in nome_original:
+                raise ValidationError('Arquivo sem extensão válida.')
 
             extensoes_permitidas = current_app.config['ALLOWED_EXTENSIONS']
             extensao = nome_original.rsplit('.', 1)[1].lower()
             if extensao not in extensoes_permitidas:
                 raise ValidationError('Formato de imagem não permitido.')
 
-            nome_arquivo = f"{uuid.uuid4()}.{extensao}"
+            if is_principal:
+                fotografias_principais = (Fotografia.query.filter_by(
+                    indicacao_id=indicacao.id,
+                    is_principal=True
+                ).all())
 
+                for foto_principal in fotografias_principais:
+                    foto_principal.is_principal = False
+            
+            nome_arquivo = f"{uuid.uuid4()}.{extensao}"
             os.makedirs(UPLOAD_FOLDER, exist_ok=True)
             
             caminho_completo = os.path.join(UPLOAD_FOLDER, nome_arquivo)
@@ -54,7 +53,7 @@ class FotografiaService:
                 data_upload=datetime.utcnow(),
                 indicacao=indicacao
             )
-            
+
             FotografiaRepository.salvar(fotografia)
             
             return fotografia
