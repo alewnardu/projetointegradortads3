@@ -6,6 +6,7 @@ from app.routes.brinquedoteca_routes import brinquedoteca_bp
 from app.routes.endereco_routes import endereco_indicacao_bp
 from app.routes.localizacao_routes import localizacao_endereco_indicacao_bp
 from app.routes.fotografia_routes import fotografia_bp
+from app.routes.avaliacao_routes import avaliacao_bp
 
 def lista_blueprints():
     return [
@@ -16,5 +17,6 @@ def lista_blueprints():
         brinquedoteca_bp, 
         endereco_indicacao_bp, 
         localizacao_endereco_indicacao_bp, 
-        fotografia_bp
-        ]
+        fotografia_bp,
+        avaliacao_bp
+    ]
