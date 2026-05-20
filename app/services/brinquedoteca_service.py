@@ -13,6 +13,14 @@ class BrinquedotecaService:
         return BrinquedotecaRepository.listar()
 
     @staticmethod
+    def buscar_brinquedoteca(brinquedoteca_id):
+        brinquedoteca = BrinquedotecaRepository.buscar_por_id(brinquedoteca_id)
+        if not brinquedoteca:
+            raise NotFoundError('Brinquedoteca não encontrada')
+        
+        return BrinquedotecaRepository.buscar_por_id(brinquedoteca_id)
+
+    @staticmethod
     def inativar_brinquedoteca(usuario_id, brinquedoteca_id, dados):
         brinquedoteca = BrinquedotecaRepository.buscar_por_id(brinquedoteca_id)
 

@@ -1,8 +1,8 @@
 """migracao geral atualizada
 
-Revision ID: 1425dddbdeb3
+Revision ID: ce5978b9ba0e
 Revises: 
-Create Date: 2026-05-19 22:24:17.294286
+Create Date: 2026-05-19 23:10:34.135219
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1425dddbdeb3'
+revision = 'ce5978b9ba0e'
 down_revision = None
 branch_labels = None
 depends_on = None

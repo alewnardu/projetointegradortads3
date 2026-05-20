@@ -25,6 +25,24 @@ def listar_brinquedotecas():
             'error': 'Erro interno do servidor'
         }), 500
 
+@brinquedoteca_bp.route('/brinquedotecas/<int:brinquedoteca_id>', methods=['GET'])
+def buscar_brinquedoteca(brinquedoteca_id):
+    try:
+        brinquedoteca = BrinquedotecaService.buscar_brinquedoteca(brinquedoteca_id)
+        return jsonify({
+            "success": True,
+            'message': 'Brinquedoteca inativada',
+            'data': brinquedoteca_schema.dump(brinquedoteca)
+        }), 200
+    except NotFoundError as e:
+        return jsonify({
+            'error': str(e)
+        }), 404
+    except Exception as e:
+        return jsonify({
+            'error': str(e)
+        }), 500
+
 @brinquedoteca_bp.route("/brinquedotecas/<int:brinquedoteca_id>/inativar", methods=['PATCH'])
 @jwt_required()
 def inativar_brinquedoteca(brinquedoteca_id):
