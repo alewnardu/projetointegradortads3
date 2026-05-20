@@ -11,6 +11,7 @@ from app.services.endereco_service import EnderecoService
 from app.services.localizacao_service import LocalizacaoService
 from app.repositories.localizacao_repository import LocalizacaoRepository
 from app.services.fotografia_service import FotografiaService
+from app.repositories.fotografia_repository import FotografiaRepository
 
 class IndicacaoService:
 
@@ -56,6 +57,9 @@ class IndicacaoService:
         if not usuario_logado:
             raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')        
         
+        if not foto_principal:
+            raise ValidationError('A indicação deve conter uma fotografia principal.')
+
         try:
             endereco_dados = dados.pop('endereco')
             localizacao_dados = endereco_dados.pop('localizacao')
@@ -71,8 +75,7 @@ class IndicacaoService:
             localizacao = LocalizacaoService.criar_localizacao_por_endereco(endereco, localizacao_dados)
             LocalizacaoRepository.salvar(localizacao)
 
-            if foto_principal:
-                FotografiaService.criar_fotografia_por_indicacao(indicacao, foto_principal, is_principal=True)
+            FotografiaService.criar_fotografia_por_indicacao(indicacao, foto_principal, is_principal=True)
 
             for foto in fotos_adicionais:
                 FotografiaService.criar_fotografia_por_indicacao(indicacao, foto, is_principal=False)
@@ -81,6 +84,43 @@ class IndicacaoService:
 
             return IndicacaoRepository.buscar_por_id(indicacao.id)
 
+        except Exception:
+            db.session.rollback()
+            raise
+    
+    @staticmethod
+    def adicionar_fotografia_indicacao(indicacao_id, usuario_logado_id, dados, fotografia):
+
+        usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+        if not usuario_logado:
+            raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')     
+
+        indicacao = IndicacaoRepository.buscar_por_id(indicacao_id)
+        if not indicacao:
+            raise NotFoundError('Indicação de brinquedoteca não encontrada')   
+        
+        is_admin = usuario_logado.perfil == 'ADMIN'
+        is_dono_indicacao = (indicacao.usuario_indicador_id == usuario_logado.id)
+
+        if not is_admin and not is_dono_indicacao:
+            raise ForbiddenError('Você não tem permissão para adicionar fotografias à indicação de terceiros.')
+
+        if indicacao.status not in ['PENDENTE', 'APROVADA']:
+            raise BadRequestError(f'Não é possível adicionar fotografias em uma indicação com status {indicacao.status}.')
+        
+        brinquedoteca = indicacao.brinquedoteca
+        if indicacao.status == 'APROVADA' and (not brinquedoteca or brinquedoteca.status == 'INATIVA'):
+            raise BadRequestError(f'Não é possível adicionar fotografias para indicação de brinquedoteca inativada.')
+
+        is_principal = (dados.get('is_principal', '').upper() == 'PRINCIPAL')
+        
+        try:   
+
+            FotografiaService.criar_fotografia_por_indicacao(indicacao, fotografia, is_principal=is_principal)
+
+            db.session.commit()
+
+            return IndicacaoRepository.buscar_por_id(indicacao.id)
         except Exception:
             db.session.rollback()
             raise

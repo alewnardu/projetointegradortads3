@@ -199,7 +199,40 @@ def aprovar_indicacao(indicacao_id):
         return jsonify({
             'error': 'Erro interno do servidor'
         }), 500
+
+@indicacao_bp.route("/indicacoes/<int:indicacao_id>/fotografias", methods=["POST"])
+@jwt_required()
+def adicionar_fotografia_indicacao(indicacao_id):
+    try:
+        dados = json.loads(request.form.get('dados'))
+
+        fotografia = request.files.get('fotografia')
+
+        usuario_logado_id = get_jwt_identity()
+
+        print(dados);
+        print(fotografia);
+        print(usuario_logado_id)
+        
+        indicacao = IndicacaoService.adicionar_fotografia_indicacao(indicacao_id, usuario_logado_id, dados, fotografia)
+
+        return jsonify({
+            'success': True,
+            'message': 'Novo registro fotográfico adicionado',
+            'data': indicacao_schema.dump(indicacao)
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'error':  f'Ero interno do servidor - {str(e)}'
+        })
+
+
+
+
+
+
     
+
 @indicacao_bp.route("/indicacoes/<int:indicacao_id>", methods=["PATCH"])
 @jwt_required()
 def atualizar_indicacao(indicacao_id):
