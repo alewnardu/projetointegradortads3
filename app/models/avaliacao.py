@@ -16,6 +16,12 @@ class Avaliacao(db.Model):
 
     nota = db.Column(db.Integer, nullable=False)
 
+    data_avaliacao = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=db.func.current_timestamp()
+    )
+
     comentario = db.Column(db.String(500), nullable=False)
 
     brinquedoteca_id = db.Column(
