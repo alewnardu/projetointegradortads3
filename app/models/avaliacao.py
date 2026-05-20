@@ -1,4 +1,5 @@
 from app.extensions import db
+from sqlalchemy import UniqueConstraint
 
 class Avaliacao(db.Model):
 
