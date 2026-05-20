@@ -11,6 +11,7 @@ from app.services.endereco_service import EnderecoService
 from app.services.localizacao_service import LocalizacaoService
 from app.repositories.localizacao_repository import LocalizacaoRepository
 from app.services.fotografia_service import FotografiaService
+from app.repositories.fotografia_repository import FotografiaRepository
 
 class IndicacaoService:
 
@@ -56,6 +57,9 @@ class IndicacaoService:
         if not usuario_logado:
             raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')        
         
+        if not foto_principal:
+            raise ValidationError('A indicação deve conter uma fotografia principal.')
+
         try:
             endereco_dados = dados.pop('endereco')
             localizacao_dados = endereco_dados.pop('localizacao')
@@ -71,8 +75,7 @@ class IndicacaoService:
             localizacao = LocalizacaoService.criar_localizacao_por_endereco(endereco, localizacao_dados)
             LocalizacaoRepository.salvar(localizacao)
 
-            if foto_principal:
-                FotografiaService.criar_fotografia_por_indicacao(indicacao, foto_principal, is_principal=True)
+            FotografiaService.criar_fotografia_por_indicacao(indicacao, foto_principal, is_principal=True)
 
             for foto in fotos_adicionais:
                 FotografiaService.criar_fotografia_por_indicacao(indicacao, foto, is_principal=False)
