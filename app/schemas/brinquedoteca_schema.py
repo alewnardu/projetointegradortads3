@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, validate
 from app.schemas.indicacao_schema import IndicacaoSchema
+from app.schemas.avaliacao_schema import AvaliacaoSchema
 
 class BrinquedotecaSchema(Schema):
 
@@ -13,5 +14,11 @@ class BrinquedotecaSchema(Schema):
 
     indicacao = fields.Nested(
         IndicacaoSchema,
+        dump_only=True
+    )
+
+    avaliacoes = fields.Nested(
+        AvaliacaoSchema,
+        many=True,
         dump_only=True
     )

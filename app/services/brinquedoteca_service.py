@@ -81,7 +81,8 @@ class BrinquedotecaService:
             AvaliacaoRepository.salvar(avaliacao)
             
             db.session.commit()
-            return brinquedoteca
+
+            return BrinquedotecaRepository.buscar_por_id(brinquedoteca_id)
         except Exception:
             db.session.rollback()
             raise
