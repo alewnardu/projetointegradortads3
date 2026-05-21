@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
-import { 
-  ArrowLeft, Star, MapPin, SlidersHorizontal, Plus, 
-  Sparkles, ShieldCheck, X, Check, Eye, Trash, Ban, MessageSquare,
-  LogOut
+import { useToast } from '../components/Toast';
+import { useConfirm } from '../components/ConfirmModal';
+import {
+  ArrowLeft, Star, MapPin, SlidersHorizontal, Plus,
+  Sparkles, ShieldCheck, X, Check, Trash, Ban, MessageSquare,
+  LogOut, ChevronDown, Wind, Users, Heart, Upload, Search,
+  Inbox
 } from 'lucide-react';
 import './Brinquedos.css';
 
 export function Brinquedos() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { showToast } = useToast();
+  const confirm = useConfirm();
   const [user, setUser] = useState(null);
   const [token, setToken] = useState('');
 
@@ -30,14 +35,17 @@ export function Brinquedos() {
   const [selectedIndicacao, setSelectedIndicacao] = useState(null);
   const [isInactivating, setIsInactivating] = useState(false);
   const [inactivateReason, setInactivateReason] = useState('');
+  const [featuredPhotoUrl, setFeaturedPhotoUrl] = useState('');
 
   // Evaluation Form State
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
+  const [hoverRating, setHoverRating] = useState(0);
 
   // Recommendation Form State
   const [isRecommendModalOpen, setIsRecommendModalOpen] = useState(false);
   const [recommendPhoto, setRecommendPhoto] = useState(null);
+  const [recommendPhotoPreview, setRecommendPhotoPreview] = useState('');
   const [recommendData, setRecommendData] = useState({
     nome: '',
     descricao: '',
@@ -65,6 +73,7 @@ export function Brinquedos() {
   const [filterClimatizado, setFilterClimatizado] = useState(false);
   const [filterMonitores, setFilterMonitores] = useState(false);
   const [filterGratuito, setFilterGratuito] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(true);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -79,12 +88,13 @@ export function Brinquedos() {
     try {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
-      
-      // Auto-set tab based on navigation state or profile
+
       if (location.state?.activeTab) {
         setActiveTab(location.state.activeTab);
-      } else if (parsedUser.perfil === 'ADMIN') {
-        setActiveTab('explore');
+        if (location.state.activeTab === 'recommend') {
+          setIsRecommendModalOpen(true);
+          setActiveTab('explore');
+        }
       } else {
         setActiveTab('explore');
       }
@@ -100,13 +110,11 @@ export function Brinquedos() {
     setError('');
 
     try {
-      // 1. Fetch playrooms (brinquedotecas)
       const playroomsRes = await fetch('http://localhost:5000/brinquedotecas');
       const playroomsData = await playroomsRes.json();
       if (!playroomsRes.ok) throw new Error(playroomsData.error || 'Erro ao buscar brinquedotecas');
       setBrinquedotecas(playroomsData.data || []);
 
-      // 2. Fetch space recommendations (indicacoes)
       const reqHeaders = { 'Authorization': `Bearer ${token}` };
       const indicacoesRes = await fetch('http://localhost:5000/indicacoes', { headers: reqHeaders });
       if (indicacoesRes.status !== 401 && indicacoesRes.status !== 403) {
@@ -134,11 +142,19 @@ export function Brinquedos() {
     navigate('/login');
   };
 
-  // Handle Playroom Inactivation (Admin only)
+  // Update featured photo when a playroom is selected
+  useEffect(() => {
+    if (selectedBrinquedoteca) {
+      const principal = selectedBrinquedoteca.indicacao?.fotografias?.find(f => f.is_principal)
+        || selectedBrinquedoteca.indicacao?.fotografias?.[0];
+      setFeaturedPhotoUrl(principal ? `http://localhost:5000/${principal.caminho}` : '/placeholder-brinquedoteca.jpg');
+    }
+  }, [selectedBrinquedoteca]);
+
   const handleInactivate = async (e) => {
     e.preventDefault();
     if (!inactivateReason.trim()) {
-      alert('Por favor, informe uma observação ou justificativa.');
+      showToast('Por favor, informe uma justificativa para a inativação.', 'warning');
       return;
     }
 
@@ -155,20 +171,20 @@ export function Brinquedos() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Erro ao inativar brinquedoteca');
 
-      alert('Brinquedoteca inativada com sucesso.');
+      showToast('Brinquedoteca inativada com sucesso.', 'success');
       setSelectedBrinquedoteca(null);
       setIsInactivating(false);
       setInactivateReason('');
       fetchData();
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
   const handleAddReview = async (e) => {
     e.preventDefault();
     if (reviewComment.trim().length < 10) {
-      alert('O comentário deve ter no mínimo 10 caracteres.');
+      showToast('O comentário deve ter no mínimo 10 caracteres.', 'warning');
       return;
     }
 
@@ -188,19 +204,25 @@ export function Brinquedos() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Erro ao avaliar a brinquedoteca');
 
-      alert('Avaliação enviada com sucesso!');
+      showToast('Avaliação enviada com sucesso! Obrigado pela colaboração.', 'success');
       setReviewComment('');
-      // Update selected playroom details to render new reviews
+      setReviewRating(5);
       setSelectedBrinquedoteca(data.data);
       fetchData();
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
-  // Handle Suggestion Approval (Admin only)
   const handleApproveIndicacao = async (id) => {
-    if (!window.confirm('Deseja realmente aprovar esta indicação? Isso criará uma brinquedoteca ativa automaticamente.')) return;
+    const ok = await confirm({
+      title: 'Aprovar Indicação',
+      message: 'Deseja realmente aprovar esta indicação? Isso criará uma brinquedoteca ativa automaticamente no sistema.',
+      confirmText: 'Sim, Aprovar',
+      cancelText: 'Cancelar',
+      isDestructive: false,
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`http://localhost:5000/indicacoes/${id}/aprovar`, {
@@ -211,17 +233,23 @@ export function Brinquedos() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Erro ao aprovar indicação');
 
-      alert('Indicação aprovada e Brinquedoteca criada com sucesso!');
+      showToast('Indicação aprovada! Brinquedoteca criada com sucesso.', 'success');
       setSelectedIndicacao(null);
       fetchData();
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
-  // Handle Suggestion Rejection (Admin only)
   const handleRejectIndicacao = async (id) => {
-    if (!window.confirm('Deseja realmente rejeitar esta indicação?')) return;
+    const ok = await confirm({
+      title: 'Rejeitar Indicação',
+      message: 'Deseja realmente rejeitar esta indicação? Esta ação não poderá ser desfeita.',
+      confirmText: 'Rejeitar',
+      cancelText: 'Voltar',
+      isDestructive: true,
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`http://localhost:5000/indicacoes/${id}/rejeitar`, {
@@ -232,17 +260,23 @@ export function Brinquedos() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Erro ao rejeitar indicação');
 
-      alert('Indicação rejeitada.');
+      showToast('Indicação rejeitada.', 'info');
       setSelectedIndicacao(null);
       fetchData();
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
-  // Handle Suggestion Cancellation (Citizen owner only)
   const handleCancelIndicacao = async (id) => {
-    if (!window.confirm('Deseja realmente cancelar sua indicação?')) return;
+    const ok = await confirm({
+      title: 'Cancelar Indicação',
+      message: 'Deseja realmente cancelar sua indicação? Ela será removida do sistema.',
+      confirmText: 'Cancelar Indicação',
+      cancelText: 'Manter',
+      isDestructive: true,
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`http://localhost:5000/indicacoes/${id}/cancelar`, {
@@ -253,35 +287,30 @@ export function Brinquedos() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Erro ao cancelar indicação');
 
-      alert('Indicação cancelada com sucesso.');
+      showToast('Indicação cancelada com sucesso.', 'info');
       setSelectedIndicacao(null);
       fetchData();
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
-  // Handle Recommendation Space submission
   const handleRecommendSubmit = async (e) => {
     e.preventDefault();
     if (!recommendPhoto) {
-      alert('Por favor, faça upload de uma foto principal do local.');
+      showToast('Por favor, faça upload de uma foto principal do local.', 'warning');
       return;
     }
 
-    // Basic CEP validation
     const cepDigits = recommendData.endereco.cep.replace(/\D/g, '');
     if (cepDigits.length !== 8) {
-      alert('O CEP deve conter exatamente 8 dígitos numéricos.');
+      showToast('O CEP deve conter exatamente 8 dígitos numéricos.', 'warning');
       return;
     }
 
     const payload = {
       ...recommendData,
-      endereco: {
-        ...recommendData.endereco,
-        cep: cepDigits
-      }
+      endereco: { ...recommendData.endereco, cep: cepDigits }
     };
 
     const formData = new FormData();
@@ -298,34 +327,39 @@ export function Brinquedos() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Erro ao registrar indicação');
 
-      alert('Indicação de brinquedoteca enviada com sucesso para análise!');
+      showToast('Indicação enviada com sucesso para análise! Obrigado pela contribuição.', 'success');
       setIsRecommendModalOpen(false);
       setRecommendPhoto(null);
-      // Reset form
+      setRecommendPhotoPreview('');
       setRecommendData({
-        nome: '',
-        descricao: '',
-        tem_climatizacao: false,
-        tem_monitores: false,
-        tem_gratuidade: false,
-        porte: 'MEDIO',
+        nome: '', descricao: '', tem_climatizacao: false,
+        tem_monitores: false, tem_gratuidade: false, porte: 'MEDIO',
         endereco: {
-          logradouro: '',
-          numero: '',
-          bairro: '',
-          cidade: 'Palmas',
-          estado: 'TO',
-          cep: '',
-          localizacao: {
-            latitude: -10.18,
-            longitude: -48.33
-          }
+          logradouro: '', numero: '', bairro: '',
+          cidade: 'Palmas', estado: 'TO', cep: '',
+          localizacao: { latitude: -10.18, longitude: -48.33 }
         }
       });
       fetchData();
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setRecommendPhoto(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setRecommendPhotoPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Get initials for review avatars
+  const getInitials = (name) => {
+    if (!name) return '?';
+    return name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
   };
 
   // Helper: calculate playroom average rating
@@ -337,14 +371,9 @@ export function Brinquedos() {
 
   // Filter playrooms
   const filteredBrinquedotecas = brinquedotecas.filter(b => {
-    // 1. Text Search
-    const nameMatch = b.indicacao?.nome?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                      b.observacao?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    // 2. Status check: Citizens only see ATIVA, Admins see all
+    const nameMatch = b.indicacao?.nome?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      b.indicacao?.endereco?.bairro?.toLowerCase().includes(searchQuery.toLowerCase());
     const statusMatch = user?.perfil === 'ADMIN' ? true : b.status === 'ATIVA';
-
-    // 3. Filters
     const sizeMatch = filterSize === 'ALL' || b.indicacao?.porte === filterSize;
     const climatizadoMatch = !filterClimatizado || b.indicacao?.tem_climatizacao;
     const monitoresMatch = !filterMonitores || b.indicacao?.tem_monitores;
@@ -355,15 +384,22 @@ export function Brinquedos() {
 
   return (
     <div className="brinquedos-container">
+      {/* Background Animated Blobs */}
+      <div className="blob-container">
+        <div className="blob blob-orange" />
+        <div className="blob blob-green" />
+        <div className="blob blob-yellow" />
+      </div>
+
       {/* Header */}
       <header className="page-header">
         {user?.perfil === 'ADMIN' ? (
           <Button variant="secondary" onClick={() => navigate('/dashboard')} className="back-btn">
-            <ArrowLeft size={18} /> Voltar
+            <ArrowLeft size={16} /> Voltar
           </Button>
         ) : (
           <Button variant="secondary" onClick={handleLogout} className="logout-btn">
-            <LogOut size={18} /> Sair
+            <LogOut size={16} /> Sair
           </Button>
         )}
         <div className="page-brand">
@@ -372,14 +408,15 @@ export function Brinquedos() {
         </div>
         {user?.perfil === 'CIDADAO' && (
           <Button className="add-btn" onClick={() => setIsRecommendModalOpen(true)}>
-            <Plus size={18} /> Indicar Novo Espaço
+            <Plus size={16} /> Indicar Espaço
           </Button>
         )}
+        {user?.perfil === 'ADMIN' && <div style={{ width: '120px' }} />}
       </header>
 
-      {/* Main Tabs Selection */}
+      {/* Main Tabs */}
       <div className="tabs-container">
-        <button 
+        <button
           className={`tab-item ${activeTab === 'explore' ? 'active' : ''}`}
           onClick={() => setActiveTab('explore')}
         >
@@ -387,7 +424,7 @@ export function Brinquedos() {
         </button>
 
         {user?.perfil === 'CIDADAO' && (
-          <button 
+          <button
             className={`tab-item ${activeTab === 'recommendations' ? 'active' : ''}`}
             onClick={() => setActiveTab('recommendations')}
           >
@@ -396,7 +433,7 @@ export function Brinquedos() {
         )}
 
         {user?.perfil === 'ADMIN' && (
-          <button 
+          <button
             className={`tab-item ${activeTab === 'admin-indicacoes' ? 'active' : ''}`}
             onClick={() => setActiveTab('admin-indicacoes')}
           >
@@ -410,78 +447,96 @@ export function Brinquedos() {
 
         {loading ? (
           <div className="loading-state">
-            <div className="spinner"></div>
+            <div className="spinner" />
             <p>Sincronizando dados...</p>
           </div>
         ) : (
           <>
-            {/* EXPLORE TAB */}
+            {/* ======================== EXPLORE TAB ======================== */}
             {activeTab === 'explore' && (
               <div className="explore-section">
-                {/* Filters Row */}
+                {/* Collapsible Filters */}
                 <Card className="filters-card">
-                  <div className="filters-header">
-                    <SlidersHorizontal size={18} />
-                    <h3>Buscar e Filtrar</h3>
-                  </div>
-                  <div className="filters-grid">
-                    <Input 
-                      placeholder="Pesquisar por nome ou bairro..." 
-                      value={searchQuery}
-                      onChange={e => setSearchQuery(e.target.value)}
+                  <button
+                    className="filters-toggle-btn"
+                    onClick={() => setFiltersOpen(!filtersOpen)}
+                  >
+                    <span className="filters-toggle-left">
+                      <SlidersHorizontal size={18} />
+                      <h3>Buscar e Filtrar</h3>
+                    </span>
+                    <ChevronDown
+                      size={20}
+                      className={`filters-chevron ${filtersOpen ? 'open' : ''}`}
                     />
+                  </button>
+                  <div className={`filters-body ${filtersOpen ? 'open' : ''}`}>
+                    <div className="filters-grid">
+                      <div className="input-group" style={{ marginBottom: 0 }}>
+                        <label>Buscar por Nome ou Bairro</label>
+                        <div style={{ position: 'relative' }}>
+                          <input
+                            className="input-field"
+                            placeholder="Ex: Cesamar, Plano Diretor..."
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            style={{ paddingLeft: '42px', width: '100%' }}
+                          />
+                          <Search size={16} style={{
+                            position: 'absolute', left: '14px', top: '50%',
+                            transform: 'translateY(-50%)', color: 'var(--on-surface-variant)', pointerEvents: 'none'
+                          }} />
+                        </div>
+                      </div>
 
-                    <div className="filter-group">
-                      <label>Porte do Espaço</label>
-                      <select value={filterSize} onChange={e => setFilterSize(e.target.value)}>
-                        <option value="ALL">Todos os tamanhos</option>
-                        <option value="PEQUENO">Pequeno</option>
-                        <option value="MEDIO">Médio</option>
-                        <option value="GRANDE">Grande</option>
-                      </select>
-                    </div>
+                      <div className="filter-group">
+                        <label>Porte do Espaço</label>
+                        <select value={filterSize} onChange={e => setFilterSize(e.target.value)}>
+                          <option value="ALL">Todos os tamanhos</option>
+                          <option value="PEQUENO">Pequeno</option>
+                          <option value="MEDIO">Médio</option>
+                          <option value="GRANDE">Grande</option>
+                        </select>
+                      </div>
 
-                    <div className="checkboxes-group">
-                      <label className="checkbox-label">
-                        <input 
-                          type="checkbox" 
-                          checked={filterClimatizado} 
-                          onChange={e => setFilterClimatizado(e.target.checked)} 
-                        />
-                        Climatizado
-                      </label>
-                      <label className="checkbox-label">
-                        <input 
-                          type="checkbox" 
-                          checked={filterMonitores} 
-                          onChange={e => setFilterMonitores(e.target.checked)} 
-                        />
-                        Monitores Supervisionados
-                      </label>
-                      <label className="checkbox-label">
-                        <input 
-                          type="checkbox" 
-                          checked={filterGratuito} 
-                          onChange={e => setFilterGratuito(e.target.checked)} 
-                        />
-                        Gratuidade Completa
-                      </label>
+                      <div>
+                        <label className="filter-group" style={{ marginBottom: '8px', fontSize: '13px', fontWeight: '700', color: 'var(--on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          Características
+                        </label>
+                        <div className="checkboxes-group">
+                          <label className={`checkbox-chip ${filterClimatizado ? 'checked' : ''}`}>
+                            <input type="checkbox" checked={filterClimatizado} onChange={e => setFilterClimatizado(e.target.checked)} />
+                            <Wind size={14} /> Climatizado
+                          </label>
+                          <label className={`checkbox-chip ${filterMonitores ? 'checked' : ''}`}>
+                            <input type="checkbox" checked={filterMonitores} onChange={e => setFilterMonitores(e.target.checked)} />
+                            <Users size={14} /> Monitores
+                          </label>
+                          <label className={`checkbox-chip ${filterGratuito ? 'checked' : ''}`}>
+                            <input type="checkbox" checked={filterGratuito} onChange={e => setFilterGratuito(e.target.checked)} />
+                            <Heart size={14} /> Gratuito
+                          </label>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </Card>
 
-                {/* Grid Lists */}
+                {/* Playrooms Grid */}
                 {filteredBrinquedotecas.length === 0 ? (
                   <div className="empty-state">
-                    <p>Nenhuma brinquedoteca corresponde aos seus critérios de busca.</p>
+                    <div className="empty-state-icon">
+                      <Inbox size={40} />
+                    </div>
+                    <p>Nenhuma brinquedoteca encontrada com os filtros aplicados. Tente ajustar sua busca!</p>
                   </div>
                 ) : (
                   <div className="brinquedos-grid">
                     {filteredBrinquedotecas.map(b => {
                       const rating = getAverageRating(b);
                       const principalPhoto = b.indicacao?.fotografias?.find(f => f.is_principal) || b.indicacao?.fotografias?.[0];
-                      const photoUrl = principalPhoto 
-                        ? `http://localhost:5000/${principalPhoto.caminho}` 
+                      const photoUrl = principalPhoto
+                        ? `http://localhost:5000/${principalPhoto.caminho}`
                         : '/placeholder-brinquedoteca.jpg';
 
                       return (
@@ -492,18 +547,18 @@ export function Brinquedos() {
                               {b.status}
                             </span>
                           </div>
-                          
+
                           <div className="card-details">
                             <div className="card-title-row">
                               <h3>{b.indicacao?.nome}</h3>
                               <div className="rating-pill">
-                                <Star size={14} fill="currentColor" />
+                                <Star size={12} fill="currentColor" />
                                 <span>{rating > 0 ? rating : 'Novo'}</span>
                               </div>
                             </div>
-                            
+
                             <p className="card-desc">
-                              {b.indicacao?.descricao || 'Parquinho recreativo monitorado com diversas opções de lazer.'}
+                              {b.indicacao?.descricao || 'Espaço recreativo monitorado com diversas opções de lazer infantil.'}
                             </p>
 
                             <div className="card-tags">
@@ -514,7 +569,7 @@ export function Brinquedos() {
                             </div>
 
                             <div className="card-footer-location">
-                              <MapPin size={14} />
+                              <MapPin size={13} />
                               <span>{b.indicacao?.endereco?.bairro}, {b.indicacao?.endereco?.cidade}</span>
                             </div>
                           </div>
@@ -526,26 +581,29 @@ export function Brinquedos() {
               </div>
             )}
 
-            {/* RECOMMENDATIONS TAB (Citizen only) */}
+            {/* ======================== CITIZEN RECOMMENDATIONS TAB ======================== */}
             {activeTab === 'recommendations' && (
               <div className="explore-section">
                 <div className="section-title-row">
-                  <h2>Acompanhe Suas Sugestões de Espaços</h2>
+                  <h2>Minhas Indicações de Espaços</h2>
                   <Button className="add-btn" onClick={() => setIsRecommendModalOpen(true)}>
-                    <Plus size={18} /> Sugerir Novo Local
+                    <Plus size={16} /> Sugerir Novo Local
                   </Button>
                 </div>
 
                 {indicacoes.length === 0 ? (
                   <div className="empty-state">
+                    <div className="empty-state-icon">
+                      <Inbox size={40} />
+                    </div>
                     <p>Você ainda não enviou nenhuma indicação de espaço de lazer. Que tal sugerir um agora mesmo?</p>
                   </div>
                 ) : (
                   <div className="brinquedos-grid">
                     {indicacoes.map(ind => {
                       const principalPhoto = ind.fotografias?.find(f => f.is_principal) || ind.fotografias?.[0];
-                      const photoUrl = principalPhoto 
-                        ? `http://localhost:5000/${principalPhoto.caminho}` 
+                      const photoUrl = principalPhoto
+                        ? `http://localhost:5000/${principalPhoto.caminho}`
                         : '/placeholder-brinquedoteca.jpg';
 
                       return (
@@ -556,11 +614,11 @@ export function Brinquedos() {
                               {ind.status}
                             </span>
                           </div>
-                          
+
                           <div className="card-details">
                             <h3>{ind.nome}</h3>
                             <p className="card-desc">{ind.descricao || 'Nenhuma descrição fornecida.'}</p>
-                            
+
                             <div className="card-tags">
                               {ind.tem_climatizacao && <span className="chip chip-blue">Climatizado</span>}
                               {ind.tem_monitores && <span className="chip chip-green">Monitores</span>}
@@ -569,7 +627,7 @@ export function Brinquedos() {
                             </div>
 
                             <div className="card-footer-location">
-                              <MapPin size={14} />
+                              <MapPin size={13} />
                               <span>{ind.endereco?.bairro}, {ind.endereco?.cidade}</span>
                             </div>
                           </div>
@@ -581,21 +639,26 @@ export function Brinquedos() {
               </div>
             )}
 
-            {/* ADMIN RECOMMENDATIONS TAB */}
+            {/* ======================== ADMIN RECOMMENDATIONS TAB ======================== */}
             {activeTab === 'admin-indicacoes' && (
               <div className="explore-section">
-                <h2>Gerenciar Indicações Enviadas por Cidadãos</h2>
+                <div className="section-title-row">
+                  <h2>Gerenciar Indicações de Cidadãos</h2>
+                </div>
 
                 {indicacoes.length === 0 ? (
                   <div className="empty-state">
+                    <div className="empty-state-icon">
+                      <Inbox size={40} />
+                    </div>
                     <p>Nenhuma recomendação de espaço cadastrada no sistema.</p>
                   </div>
                 ) : (
                   <div className="brinquedos-grid">
                     {indicacoes.map(ind => {
                       const principalPhoto = ind.fotografias?.find(f => f.is_principal) || ind.fotografias?.[0];
-                      const photoUrl = principalPhoto 
-                        ? `http://localhost:5000/${principalPhoto.caminho}` 
+                      const photoUrl = principalPhoto
+                        ? `http://localhost:5000/${principalPhoto.caminho}`
                         : '/placeholder-brinquedoteca.jpg';
 
                       return (
@@ -606,11 +669,11 @@ export function Brinquedos() {
                               {ind.status}
                             </span>
                           </div>
-                          
+
                           <div className="card-details">
                             <h3>{ind.nome}</h3>
                             <p className="card-desc">{ind.descricao || 'Nenhuma descrição fornecida.'}</p>
-                            
+
                             <div className="card-tags">
                               {ind.tem_climatizacao && <span className="chip chip-blue">Climatizado</span>}
                               {ind.tem_monitores && <span className="chip chip-green">Monitores</span>}
@@ -619,26 +682,25 @@ export function Brinquedos() {
                             </div>
 
                             <div className="card-footer-location">
-                              <MapPin size={14} />
+                              <MapPin size={13} />
                               <span>{ind.endereco?.bairro}, {ind.endereco?.cidade}</span>
                             </div>
 
                             {ind.status === 'PENDENTE' && (
                               <div className="card-admin-quick-actions" onClick={e => e.stopPropagation()}>
-                                <Button 
-                                  variant="secondary" 
+                                <Button
+                                  variant="secondary"
                                   onClick={() => handleApproveIndicacao(ind.id)}
                                   className="approve-action-btn"
                                 >
-                                  <Check size={14} /> Aprovar
+                                  <Check size={13} /> Aprovar
                                 </Button>
-                                <Button 
-                                  variant="secondary" 
+                                <Button
+                                  variant="secondary"
                                   onClick={() => handleRejectIndicacao(ind.id)}
                                   className="reject-action-btn"
-                                  style={{ color: 'var(--error)' }}
                                 >
-                                  <Ban size={14} /> Rejeitar
+                                  <Ban size={13} /> Rejeitar
                                 </Button>
                               </div>
                             )}
@@ -654,51 +716,51 @@ export function Brinquedos() {
         )}
       </main>
 
-      {/* DETAIL MODAL: PLAYROOM (BRINQUEDOTECA) */}
+      {/* ======================== MODAL: PLAYROOM DETAIL ======================== */}
       {selectedBrinquedoteca && (
         <div className="modal-overlay" onClick={() => { setSelectedBrinquedoteca(null); setIsInactivating(false); }}>
           <Card className="modal-content glass" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Detalhes da Brinquedoteca</h2>
-              <button className="close-btn" onClick={() => { setSelectedBrinquedoteca(null); setIsInactivating(false); }}><X size={24} /></button>
+              <h2>{selectedBrinquedoteca.indicacao?.nome}</h2>
+              <button className="close-btn" onClick={() => { setSelectedBrinquedoteca(null); setIsInactivating(false); }}>
+                <X size={20} />
+              </button>
             </div>
 
             <div className="modal-body-split">
-              {/* Left Side: Images and Quick specs */}
+              {/* Left: Images & Specs */}
               <div className="modal-body-left">
-                {(() => {
-                  const principalPhoto = selectedBrinquedoteca.indicacao?.fotografias?.find(f => f.is_principal) || selectedBrinquedoteca.indicacao?.fotografias?.[0];
-                  const photoUrl = principalPhoto 
-                    ? `http://localhost:5000/${principalPhoto.caminho}` 
-                    : '/placeholder-brinquedoteca.jpg';
-                  return <img src={photoUrl} alt="Foto Principal" className="modal-featured-image" />;
-                })()}
+                <img src={featuredPhotoUrl} alt="Foto Principal" className="modal-featured-image" />
 
-                {/* Additional gallery if exists */}
+                {/* Clickable thumbnail gallery */}
                 {selectedBrinquedoteca.indicacao?.fotografias?.length > 1 && (
                   <div className="modal-gallery">
-                    {selectedBrinquedoteca.indicacao.fotografias.map(photo => (
-                      <img 
-                        key={photo.id} 
-                        src={`http://localhost:5000/${photo.caminho}`} 
-                        alt="Galeria" 
-                        className="modal-gallery-thumb" 
-                      />
-                    ))}
+                    {selectedBrinquedoteca.indicacao.fotografias.map(photo => {
+                      const thumbUrl = `http://localhost:5000/${photo.caminho}`;
+                      return (
+                        <img
+                          key={photo.id}
+                          src={thumbUrl}
+                          alt="Galeria"
+                          className={`modal-gallery-thumb ${featuredPhotoUrl === thumbUrl ? 'active-thumb' : ''}`}
+                          onClick={() => setFeaturedPhotoUrl(thumbUrl)}
+                        />
+                      );
+                    })}
                   </div>
                 )}
 
                 <div className="modal-specs">
-                  <h4>Características Técnicas</h4>
-                  <div className="card-tags">
+                  <h4>Características</h4>
+                  <div className="card-tags" style={{ marginBottom: 0 }}>
                     <span className={`chip ${selectedBrinquedoteca.indicacao?.tem_climatizacao ? 'chip-blue' : 'chip-disabled'}`}>
-                      {selectedBrinquedoteca.indicacao?.tem_climatizacao ? 'Climatizado' : 'Sem Ar Condicionado'}
+                      {selectedBrinquedoteca.indicacao?.tem_climatizacao ? '✓ Climatizado' : '✗ Sem Ar'}
                     </span>
                     <span className={`chip ${selectedBrinquedoteca.indicacao?.tem_monitores ? 'chip-green' : 'chip-disabled'}`}>
-                      {selectedBrinquedoteca.indicacao?.tem_monitores ? 'Monitores' : 'Sem Monitoria'}
+                      {selectedBrinquedoteca.indicacao?.tem_monitores ? '✓ Monitores' : '✗ Sem Monitoria'}
                     </span>
                     <span className={`chip ${selectedBrinquedoteca.indicacao?.tem_gratuidade ? 'chip-orange' : 'chip-disabled'}`}>
-                      {selectedBrinquedoteca.indicacao?.tem_gratuidade ? 'Gratuito' : 'Acesso Pago'}
+                      {selectedBrinquedoteca.indicacao?.tem_gratuidade ? '✓ Gratuito' : '✗ Acesso Pago'}
                     </span>
                     <span className="chip chip-gray">Porte {selectedBrinquedoteca.indicacao?.porte}</span>
                   </div>
@@ -713,21 +775,20 @@ export function Brinquedos() {
                     {selectedBrinquedoteca.indicacao?.endereco?.cidade} - {selectedBrinquedoteca.indicacao?.endereco?.estado}
                   </p>
                   <div className="coordinates">
-                    <MapPin size={14} /> 
+                    <MapPin size={12} />
                     <span>
-                      Lat: {selectedBrinquedoteca.indicacao?.endereco?.localizacao?.latitude} | 
+                      Lat: {selectedBrinquedoteca.indicacao?.endereco?.localizacao?.latitude} |
                       Long: {selectedBrinquedoteca.indicacao?.endereco?.localizacao?.longitude}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Right Side: Details, reviews and ratings */}
+              {/* Right: Details & Reviews */}
               <div className="modal-body-right">
                 <div className="modal-title-desc">
-                  <h2>{selectedBrinquedoteca.indicacao?.nome}</h2>
                   <p className="status-indicator">
-                    Status Atual: 
+                    Status:
                     <span className={`status-badge status-${selectedBrinquedoteca.status.toLowerCase()}`}>
                       {selectedBrinquedoteca.status}
                     </span>
@@ -745,71 +806,88 @@ export function Brinquedos() {
 
                 {/* Evaluations Section */}
                 <div className="modal-evaluations-section">
-                  <h3>Comentários e Avaliações</h3>
-                  
+                  <h3>
+                    Avaliações ({selectedBrinquedoteca.avaliacoes?.length || 0})
+                  </h3>
+
                   <div className="evaluations-list">
                     {!selectedBrinquedoteca.avaliacoes || selectedBrinquedoteca.avaliacoes.length === 0 ? (
-                      <p className="no-reviews-note">Esta brinquedoteca ainda não recebeu avaliações dos pais. Seja o primeiro a opinar!</p>
+                      <p className="no-reviews-note">Esta brinquedoteca ainda não tem avaliações. Seja o primeiro!</p>
                     ) : (
                       selectedBrinquedoteca.avaliacoes.map(review => (
                         <div key={review.id} className="review-item">
-                          <div className="review-header">
-                            <strong>{review.usuario_avaliador?.nome || (review.usuario_avaliador_id === user?.id ? user?.nome : 'Usuário')}</strong>
-                            <div className="review-stars">
-                              {Array.from({ length: 5 }).map((_, i) => (
-                                <Star 
-                                  key={i} 
-                                  size={12} 
-                                  fill={i < review.nota ? "var(--tertiary-container)" : "none"} 
-                                  color="var(--tertiary)"
-                                />
-                              ))}
-                            </div>
+                          <div className="review-avatar">
+                            {getInitials(review.usuario_avaliador?.nome || (review.usuario_avaliador_id === user?.id ? user?.nome : 'U'))}
                           </div>
-                          <p className="review-comment">{review.comentario}</p>
-                          <span className="review-date">
-                            {review.data_avaliacao ? new Date(review.data_avaliacao).toLocaleDateString('pt-BR') : 'Recente'}
-                          </span>
+                          <div className="review-body">
+                            <div className="review-header">
+                              <strong>{review.usuario_avaliador?.nome || (review.usuario_avaliador_id === user?.id ? user?.nome : 'Usuário')}</strong>
+                              <div className="review-stars">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    size={13}
+                                    fill={i < review.nota ? 'var(--tertiary)' : 'none'}
+                                    color="var(--tertiary)"
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <p className="review-comment">{review.comentario}</p>
+                            <span className="review-date">
+                              {review.data_avaliacao ? new Date(review.data_avaliacao).toLocaleDateString('pt-BR') : 'Recente'}
+                            </span>
+                          </div>
                         </div>
                       ))
                     )}
                   </div>
 
-                  {/* Add review form (Citizen only and playroom must be active) */}
+                  {/* Add review form (Citizen only, active playroom) */}
                   {user?.perfil === 'CIDADAO' && selectedBrinquedoteca.status === 'ATIVA' && (
                     <form onSubmit={handleAddReview} className="add-review-form">
-                      <h4>Escrever Avaliação</h4>
-                      
-                      <div className="input-group">
-                        <label>Nota (1 a 5 Estrelas)</label>
-                        <select value={reviewRating} onChange={e => setReviewRating(Number(e.target.value))}>
-                          <option value="5">⭐⭐⭐⭐⭐ (Excelente)</option>
-                          <option value="4">⭐⭐⭐⭐ (Muito bom)</option>
-                          <option value="3">⭐⭐⭐ (Regular)</option>
-                          <option value="2">⭐⭐ (Ruim)</option>
-                          <option value="1">⭐ (Péssimo)</option>
-                        </select>
+                      <h4>Deixar Avaliação</h4>
+
+                      <div>
+                        <label style={{ fontSize: '13px', fontWeight: '700', color: 'var(--on-surface-variant)', display: 'block', marginBottom: '8px' }}>
+                          Sua Nota
+                        </label>
+                        <div className="star-rating-selector">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <button
+                              key={star}
+                              type="button"
+                              className={`star-btn ${star <= (hoverRating || reviewRating) ? 'active' : ''}`}
+                              onClick={() => setReviewRating(star)}
+                              onMouseEnter={() => setHoverRating(star)}
+                              onMouseLeave={() => setHoverRating(0)}
+                            >
+                              <Star size={26} fill={star <= (hoverRating || reviewRating) ? 'currentColor' : 'none'} />
+                            </button>
+                          ))}
+                        </div>
                       </div>
 
-                      <Input 
-                        label="Opinião/Observações"
-                        placeholder="Compartilhe como foi a experiência das crianças..."
+                      <Input
+                        label="Compartilhe sua experiência"
+                        placeholder="Como foi a experiência das crianças neste espaço?"
                         value={reviewComment}
                         onChange={e => setReviewComment(e.target.value)}
                         required
                       />
 
-                      <Button type="submit">Enviar Avaliação</Button>
+                      <Button type="submit">
+                        <MessageSquare size={16} /> Enviar Avaliação
+                      </Button>
                     </form>
                   )}
 
                   {/* Inactivate Button (Admin only) */}
                   {user?.perfil === 'ADMIN' && selectedBrinquedoteca.status === 'ATIVA' && !isInactivating && (
-                    <Button 
-                      variant="secondary" 
+                    <Button
+                      variant="secondary"
                       onClick={() => setIsInactivating(true)}
-                      className="inactivate-btn"
-                      style={{ color: 'var(--error)', width: '100%', marginTop: '20px' }}
+                      style={{ color: 'var(--error)', borderColor: 'var(--error)', width: '100%', marginTop: '16px' }}
                     >
                       <Ban size={16} /> Inativar Brinquedoteca
                     </Button>
@@ -818,8 +896,8 @@ export function Brinquedos() {
                   {isInactivating && (
                     <form onSubmit={handleInactivate} className="inactivate-reason-form">
                       <h4>Justificativa de Inativação</h4>
-                      <Input 
-                        placeholder="Descreva o motivo (Ex: reformas estruturais, quebra de contratos...)" 
+                      <Input
+                        placeholder="Ex: Reformas estruturais, problemas de segurança..."
                         value={inactivateReason}
                         onChange={e => setInactivateReason(e.target.value)}
                         required
@@ -837,23 +915,20 @@ export function Brinquedos() {
         </div>
       )}
 
-      {/* DETAIL MODAL: RECOMMENDATION (INDICAÇÃO) */}
+      {/* ======================== MODAL: RECOMMENDATION DETAIL ======================== */}
       {selectedIndicacao && (
         <div className="modal-overlay" onClick={() => setSelectedIndicacao(null)}>
           <Card className="modal-content glass" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Detalhes da Indicação de Espaço</h2>
-              <button className="close-btn" onClick={() => setSelectedIndicacao(null)}><X size={24} /></button>
+              <h2>{selectedIndicacao.nome}</h2>
+              <button className="close-btn" onClick={() => setSelectedIndicacao(null)}><X size={20} /></button>
             </div>
 
             <div className="modal-body-split">
-              {/* Left Side: Images and Address */}
               <div className="modal-body-left">
                 {(() => {
-                  const principalPhoto = selectedIndicacao.fotografias?.find(f => f.is_principal) || selectedIndicacao.fotografias?.[0];
-                  const photoUrl = principalPhoto 
-                    ? `http://localhost:5000/${principalPhoto.caminho}` 
-                    : '/placeholder-brinquedoteca.jpg';
+                  const principal = selectedIndicacao.fotografias?.find(f => f.is_principal) || selectedIndicacao.fotografias?.[0];
+                  const photoUrl = principal ? `http://localhost:5000/${principal.caminho}` : '/placeholder-brinquedoteca.jpg';
                   return <img src={photoUrl} alt="Foto Principal" className="modal-featured-image" />;
                 })()}
 
@@ -866,39 +941,32 @@ export function Brinquedos() {
                     {selectedIndicacao.endereco?.cidade} - {selectedIndicacao.endereco?.estado}
                   </p>
                   <div className="coordinates">
-                    <MapPin size={14} /> 
-                    <span>
-                      Lat: {selectedIndicacao.endereco?.localizacao?.latitude} | 
-                      Long: {selectedIndicacao.endereco?.localizacao?.longitude}
-                    </span>
+                    <MapPin size={12} />
+                    <span>Lat: {selectedIndicacao.endereco?.localizacao?.latitude} | Long: {selectedIndicacao.endereco?.localizacao?.longitude}</span>
                   </div>
                 </div>
 
-                <div className="modal-specs">
-                  <h4>Galeria Fotográfica</h4>
-                  {selectedIndicacao.fotografias?.length > 0 ? (
+                {selectedIndicacao.fotografias?.length > 0 && (
+                  <div className="modal-specs">
+                    <h4>Galeria Fotográfica</h4>
                     <div className="modal-gallery">
                       {selectedIndicacao.fotografias.map(photo => (
-                        <img 
-                          key={photo.id} 
-                          src={`http://localhost:5000/${photo.caminho}`} 
-                          alt="Foto" 
-                          className="modal-gallery-thumb" 
+                        <img
+                          key={photo.id}
+                          src={`http://localhost:5000/${photo.caminho}`}
+                          alt="Foto"
+                          className="modal-gallery-thumb"
                         />
                       ))}
                     </div>
-                  ) : (
-                    <p className="no-reviews-note">Nenhuma outra foto anexada.</p>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
 
-              {/* Right Side: Details & Actions */}
               <div className="modal-body-right">
                 <div className="modal-title-desc">
-                  <h2>{selectedIndicacao.nome}</h2>
                   <p className="status-indicator">
-                    Status da Análise: 
+                    Status da Análise:
                     <span className={`status-badge status-${selectedIndicacao.status.toLowerCase()}`}>
                       {selectedIndicacao.status}
                     </span>
@@ -909,16 +977,15 @@ export function Brinquedos() {
                 </div>
 
                 <div className="modal-specs">
-                  <h4>Atributos sugeridos pelo cidadão</h4>
-                  <div className="card-tags">
-                    {selectedIndicacao.tem_climatizacao && <span className="chip chip-blue">Possui Climatização</span>}
-                    {selectedIndicacao.tem_monitores && <span className="chip chip-green">Possui Monitores</span>}
-                    {selectedIndicacao.tem_gratuidade && <span className="chip chip-orange">Livre e Gratuito</span>}
-                    <span className="chip chip-gray">Porte sugerido: {selectedIndicacao.porte}</span>
+                  <h4>Atributos sugeridos</h4>
+                  <div className="card-tags" style={{ marginBottom: 0 }}>
+                    {selectedIndicacao.tem_climatizacao && <span className="chip chip-blue">Climatizado</span>}
+                    {selectedIndicacao.tem_monitores && <span className="chip chip-green">Monitores</span>}
+                    {selectedIndicacao.tem_gratuidade && <span className="chip chip-orange">Gratuito</span>}
+                    <span className="chip chip-gray">Porte: {selectedIndicacao.porte}</span>
                   </div>
                 </div>
 
-                {/* Dates Tracking */}
                 <div className="modal-specs tracking-dates">
                   <h4>Rastreabilidade</h4>
                   <ul>
@@ -928,35 +995,27 @@ export function Brinquedos() {
                   </ul>
                 </div>
 
-                {/* Actions */}
                 <div className="modal-indicacao-actions">
-                  {/* Admin actions */}
                   {user?.perfil === 'ADMIN' && selectedIndicacao.status === 'PENDENTE' && (
                     <div className="admin-modal-decision-buttons">
-                      <Button 
-                        onClick={() => handleApproveIndicacao(selectedIndicacao.id)}
-                        className="approve-action-large-btn"
-                        style={{ width: '100%', marginBottom: '10px' }}
-                      >
+                      <Button onClick={() => handleApproveIndicacao(selectedIndicacao.id)} style={{ width: '100%' }}>
                         <Check size={18} /> Aprovar e Ativar Espaço
                       </Button>
-                      <Button 
+                      <Button
                         variant="secondary"
                         onClick={() => handleRejectIndicacao(selectedIndicacao.id)}
-                        className="reject-action-large-btn"
-                        style={{ width: '100%', color: 'var(--error)' }}
+                        style={{ width: '100%', color: 'var(--error)', borderColor: 'var(--error)' }}
                       >
                         <Ban size={18} /> Rejeitar Indicação
                       </Button>
                     </div>
                   )}
 
-                  {/* Citizen owner cancel action */}
                   {user?.perfil === 'CIDADAO' && selectedIndicacao.status === 'PENDENTE' && (
-                    <Button 
+                    <Button
                       variant="secondary"
                       onClick={() => handleCancelIndicacao(selectedIndicacao.id)}
-                      style={{ color: 'var(--error)', width: '100%' }}
+                      style={{ color: 'var(--error)', borderColor: 'var(--error)', width: '100%' }}
                     >
                       <Trash size={16} /> Cancelar Sugestão de Espaço
                     </Button>
@@ -968,22 +1027,22 @@ export function Brinquedos() {
         </div>
       )}
 
-      {/* MODAL: SUBMIT NEW PLAYROOM RECOMMENDATION (INDICAÇÃO) */}
+      {/* ======================== MODAL: SUBMIT NEW RECOMMENDATION ======================== */}
       {isRecommendModalOpen && (
         <div className="modal-overlay" onClick={() => setIsRecommendModalOpen(false)}>
-          <Card className="modal-content glass" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+          <Card className="modal-content glass" onClick={e => e.stopPropagation()} style={{ maxWidth: '860px' }}>
             <div className="modal-header">
               <h2>Indicar Novo Espaço de Lazer</h2>
-              <button className="close-btn" onClick={() => setIsRecommendModalOpen(false)}><X size={24} /></button>
+              <button className="close-btn" onClick={() => setIsRecommendModalOpen(false)}><X size={20} /></button>
             </div>
-            
+
             <form onSubmit={handleRecommendSubmit} className="recommend-form">
               <div className="form-sections-grid">
                 {/* Section A: Info */}
                 <div className="form-column">
                   <h3>Informações do Local</h3>
-                  
-                  <Input 
+
+                  <Input
                     label="Nome Sugerido do Espaço"
                     placeholder="Ex: Brinquedoteca do Parque Cesamar"
                     value={recommendData.nome}
@@ -993,7 +1052,7 @@ export function Brinquedos() {
 
                   <div className="input-group">
                     <label>Breve Descrição do Local</label>
-                    <textarea 
+                    <textarea
                       className="form-textarea"
                       placeholder="Descreva a estrutura, brinquedos disponíveis, o que precisa de melhoria..."
                       value={recommendData.descricao}
@@ -1004,10 +1063,7 @@ export function Brinquedos() {
 
                   <div className="input-group">
                     <label>Porte Sugerido</label>
-                    <select 
-                      value={recommendData.porte} 
-                      onChange={e => setRecommendData({ ...recommendData, porte: e.target.value })}
-                    >
+                    <select value={recommendData.porte} onChange={e => setRecommendData({ ...recommendData, porte: e.target.value })}>
                       <option value="PEQUENO">Pequeno (Até 50m²)</option>
                       <option value="MEDIO">Médio (50m² a 150m²)</option>
                       <option value="GRANDE">Grande (Mais de 150m²)</option>
@@ -1017,29 +1073,18 @@ export function Brinquedos() {
                   <div className="form-checkboxes">
                     <h4>Características Disponíveis</h4>
                     <label className="checkbox-label">
-                      <input 
-                        type="checkbox"
-                        checked={recommendData.tem_climatizacao}
-                        onChange={e => setRecommendData({ ...recommendData, tem_climatizacao: e.target.checked })}
-                      />
+                      <input type="checkbox" checked={recommendData.tem_climatizacao}
+                        onChange={e => setRecommendData({ ...recommendData, tem_climatizacao: e.target.checked })} />
                       O espaço é climatizado (Ar condicionado)
                     </label>
-
                     <label className="checkbox-label">
-                      <input 
-                        type="checkbox"
-                        checked={recommendData.tem_monitores}
-                        onChange={e => setRecommendData({ ...recommendData, tem_monitores: e.target.checked })}
-                      />
+                      <input type="checkbox" checked={recommendData.tem_monitores}
+                        onChange={e => setRecommendData({ ...recommendData, tem_monitores: e.target.checked })} />
                       O espaço possui monitores para supervisionar as crianças
                     </label>
-
                     <label className="checkbox-label">
-                      <input 
-                        type="checkbox"
-                        checked={recommendData.tem_gratuidade}
-                        onChange={e => setRecommendData({ ...recommendData, tem_gratuidade: e.target.checked })}
-                      />
+                      <input type="checkbox" checked={recommendData.tem_gratuidade}
+                        onChange={e => setRecommendData({ ...recommendData, tem_gratuidade: e.target.checked })} />
                       O acesso é 100% público e gratuito
                     </label>
                   </div>
@@ -1047,88 +1092,87 @@ export function Brinquedos() {
 
                 {/* Section B: Address & Photo */}
                 <div className="form-column">
-                  <h3>Localização e Endereço</h3>
+                  <h3>Localização e Evidência</h3>
 
-                  <Input 
+                  <Input
                     label="CEP (Apenas 8 números)"
                     placeholder="77000000"
                     maxLength={8}
                     value={recommendData.endereco.cep}
-                    onChange={e => setRecommendData({ 
-                      ...recommendData, 
-                      endereco: { ...recommendData.endereco, cep: e.target.value } 
+                    onChange={e => setRecommendData({
+                      ...recommendData,
+                      endereco: { ...recommendData.endereco, cep: e.target.value }
                     })}
                     required
                   />
 
-                  <Input 
+                  <Input
                     label="Logradouro / Avenida"
                     placeholder="Ex: Av. NS 2, Quadra 102 Sul"
                     value={recommendData.endereco.logradouro}
-                    onChange={e => setRecommendData({ 
-                      ...recommendData, 
-                      endereco: { ...recommendData.endereco, logradouro: e.target.value } 
+                    onChange={e => setRecommendData({
+                      ...recommendData,
+                      endereco: { ...recommendData.endereco, logradouro: e.target.value }
                     })}
                     required
                   />
 
                   <div className="form-row-2">
-                    <Input 
+                    <Input
                       label="Número (opcional)"
-                      placeholder="Ex: S/N ou Lote 4"
+                      placeholder="S/N ou Lote 4"
                       value={recommendData.endereco.numero}
-                      onChange={e => setRecommendData({ 
-                        ...recommendData, 
-                        endereco: { ...recommendData.endereco, numero: e.target.value } 
+                      onChange={e => setRecommendData({
+                        ...recommendData,
+                        endereco: { ...recommendData.endereco, numero: e.target.value }
                       })}
                     />
-
-                    <Input 
+                    <Input
                       label="Bairro"
-                      placeholder="Ex: Plano Diretor Sul"
+                      placeholder="Plano Diretor Sul"
                       value={recommendData.endereco.bairro}
-                      onChange={e => setRecommendData({ 
-                        ...recommendData, 
-                        endereco: { ...recommendData.endereco, bairro: e.target.value } 
+                      onChange={e => setRecommendData({
+                        ...recommendData,
+                        endereco: { ...recommendData.endereco, bairro: e.target.value }
                       })}
                       required
                     />
                   </div>
 
                   <div className="form-row-2">
-                    <Input 
-                      label="Cidade"
-                      value={recommendData.endereco.cidade}
-                      disabled
-                      required
-                    />
-
-                    <Input 
-                      label="Estado (UF)"
-                      value={recommendData.endereco.estado}
-                      disabled
-                      required
-                    />
+                    <Input label="Cidade" value={recommendData.endereco.cidade} disabled />
+                    <Input label="Estado (UF)" value={recommendData.endereco.estado} disabled />
                   </div>
 
-
-
-                  <div className="input-group">
-                    <label>Fotografia Principal do Local (Obrigatório)</label>
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      onChange={e => setRecommendPhoto(e.target.files[0])}
-                      required
-                    />
-                    <span className="input-file-help">Envie fotos nos formatos .png, .jpg ou .webp</span>
+                  {/* Custom Dashed Upload Zone */}
+                  <div>
+                    <label style={{ fontFamily: 'var(--font-headings)', fontSize: '14px', fontWeight: '700', color: 'var(--on-surface-variant)', display: 'block', marginBottom: '8px' }}>
+                      Fotografia Principal do Local *
+                    </label>
+                    <div className={`upload-zone ${recommendPhoto ? 'has-file' : ''}`}>
+                      <input type="file" accept="image/*" onChange={handlePhotoChange} required={!recommendPhoto} />
+                      <div className="upload-zone-icon">
+                        {recommendPhoto ? <Check size={36} /> : <Upload size={36} />}
+                      </div>
+                      <span className="upload-zone-text">
+                        {recommendPhoto ? recommendPhoto.name : 'Clique ou arraste uma foto aqui'}
+                      </span>
+                      <span className="upload-zone-subtext">
+                        Formatos: .jpg, .png, .webp
+                      </span>
+                      {recommendPhotoPreview && (
+                        <img src={recommendPhotoPreview} alt="Preview" className="upload-preview" />
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
 
               <div className="modal-actions">
                 <Button variant="secondary" type="button" onClick={() => setIsRecommendModalOpen(false)}>Cancelar</Button>
-                <Button type="submit">Enviar Indicação</Button>
+                <Button type="submit">
+                  <Sparkles size={16} /> Enviar Indicação
+                </Button>
               </div>
             </form>
           </Card>

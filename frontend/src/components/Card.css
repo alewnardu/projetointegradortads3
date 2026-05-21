@@ -1,12 +1,18 @@
 .card {
   background-color: #ffffff;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-xl); /* 24px prominent rounded corners */
   padding: var(--spacing-lg);
-  box-shadow: var(--shadow-level-1);
-  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 20px rgba(15, 28, 39, 0.05); /* Soft, ambient shadow */
+  border: 1px solid rgba(212, 222, 242, 0.5); /* subtle layout border */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.card-hoverable {
+  cursor: pointer;
 }
 
 .card-hoverable:hover {
-  transform: scale(1.02) translateY(-2px);
-  box-shadow: var(--shadow-level-2);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 30px rgba(15, 28, 39, 0.1);
+  border-color: rgba(151, 73, 0, 0.15); /* warm primary border highlight */
 }

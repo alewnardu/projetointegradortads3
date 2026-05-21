@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
-import { ArrowLeft, UserPlus, Edit2, Trash2, X } from 'lucide-react';
+import { useToast } from '../components/Toast';
+import { useConfirm } from '../components/ConfirmModal';
+import { ArrowLeft, UserPlus, Edit2, Trash2, X, ShieldCheck, User } from 'lucide-react';
 import './Usuarios.css';
 
 export function Usuarios() {
@@ -11,11 +13,19 @@ export function Usuarios() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { showToast } = useToast();
+  const confirm = useConfirm();
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [formData, setFormData] = useState({ nome: '', email: '', senha: '', perfil: 'CIDADAO' });
+
+  // Get initials for avatars
+  const getInitials = (name) => {
+    if (!name) return '?';
+    return name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+  };
 
   const fetchUsuarios = async () => {
     try {
@@ -26,9 +36,7 @@ export function Usuarios() {
       }
 
       const response = await fetch('http://localhost:5000/usuarios', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
 
       const data = await response.json();
@@ -45,8 +53,16 @@ export function Usuarios() {
     fetchUsuarios();
   }, [navigate]);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Tem certeza que deseja excluir este usuário?')) return;
+  const handleDelete = async (id, nome) => {
+    const ok = await confirm({
+      title: 'Excluir Usuário',
+      message: `Tem certeza que deseja excluir o usuário "${nome}"? Esta ação não pode ser desfeita.`,
+      confirmText: 'Sim, Excluir',
+      cancelText: 'Cancelar',
+      isDestructive: true,
+    });
+    if (!ok) return;
+
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:5000/usuarios/${id}`, {
@@ -60,8 +76,9 @@ export function Usuarios() {
       }
 
       setUsuarios(usuarios.filter(u => u.id !== id));
+      showToast(`Usuário "${nome}" excluído com sucesso.`, 'success');
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
@@ -84,10 +101,10 @@ export function Usuarios() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const url = editingUser 
-        ? `http://localhost:5000/usuarios/${editingUser.id}` 
+      const url = editingUser
+        ? `http://localhost:5000/usuarios/${editingUser.id}`
         : 'http://localhost:5000/usuarios';
-      
+
       const method = editingUser ? 'PATCH' : 'POST';
 
       const payload = {
@@ -107,7 +124,7 @@ export function Usuarios() {
 
       const response = await fetch(url, {
         method,
-        headers: { 
+        headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
@@ -117,47 +134,77 @@ export function Usuarios() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Erro ao salvar usuário');
 
-      fetchUsuarios(); // Refresh list
+      showToast(
+        editingUser ? `Usuário "${formData.nome}" atualizado com sucesso.` : `Usuário "${formData.nome}" criado com sucesso.`,
+        'success'
+      );
+      fetchUsuarios();
       closeModal();
     } catch (err) {
-      alert(err.message);
+      showToast(err.message, 'error');
     }
   };
 
   return (
     <div className="usuarios-container">
-      <header className="page-header">
+      {/* Background Blobs */}
+      <div className="blob-container">
+        <div className="blob blob-orange" />
+        <div className="blob blob-green" />
+      </div>
+
+      <header className="usuarios-header">
         <Button variant="secondary" onClick={() => navigate('/dashboard')} className="back-btn">
-          <ArrowLeft size={18} /> Voltar
+          <ArrowLeft size={16} /> Voltar
         </Button>
         <h1>Gerenciar Usuários</h1>
         <Button className="add-btn" onClick={() => openModal()}>
-          <UserPlus size={18} /> Novo Usuário
+          <UserPlus size={16} /> Novo Usuário
         </Button>
       </header>
 
       <main className="usuarios-main">
         {error && <div className="error-message">{error}</div>}
-        
+
         {isLoading ? (
-          <p>Carregando...</p>
+          <div className="loading-state">
+            <div style={{
+              width: '48px', height: '48px',
+              border: '4px solid var(--surface-container-highest)',
+              borderTop: '4px solid var(--primary)',
+              borderRadius: '50%',
+              animation: 'spin 0.9s linear infinite'
+            }} />
+            <p style={{ color: 'var(--on-surface-variant)', fontFamily: 'var(--font-headings)', fontWeight: '700' }}>
+              Carregando usuários...
+            </p>
+          </div>
         ) : (
           <div className="usuarios-list">
             {usuarios.length === 0 ? (
-              <p>Nenhum usuário encontrado.</p>
+              <div className="empty-state">
+                <p>Nenhum usuário encontrado no sistema.</p>
+              </div>
             ) : (
               usuarios.map(usuario => (
                 <Card key={usuario.id} className="usuario-card">
-                  <div className="usuario-info">
-                    <h3>{usuario.nome}</h3>
-                    <p>{usuario.email}</p>
-                    <span className="cargo-badge">{usuario.perfil === 'ADMIN' ? 'Administrador' : 'Cidadão'}</span>
+                  <div className="usuario-card-left">
+                    <div className={`user-avatar ${usuario.perfil === 'ADMIN' ? 'admin' : 'cidadao'}`}>
+                      {getInitials(usuario.nome)}
+                    </div>
+                    <div className="usuario-info">
+                      <h3>{usuario.nome}</h3>
+                      <p>{usuario.email}</p>
+                      <span className={`role-badge ${usuario.perfil === 'ADMIN' ? 'admin' : 'cidadao'}`}>
+                        {usuario.perfil === 'ADMIN' ? <><ShieldCheck size={11} /> Administrador</> : <><User size={11} /> Cidadão</>}
+                      </span>
+                    </div>
                   </div>
                   <div className="usuario-actions">
-                    <Button variant="secondary" onClick={() => openModal(usuario)}>
+                    <Button variant="secondary" className="edit-btn" onClick={() => openModal(usuario)} title="Editar usuário">
                       <Edit2 size={16} />
                     </Button>
-                    <Button variant="secondary" onClick={() => handleDelete(usuario.id)} style={{ color: 'var(--error)' }}>
+                    <Button variant="secondary" className="delete-btn" onClick={() => handleDelete(usuario.id, usuario.nome)} title="Excluir usuário">
                       <Trash2 size={16} />
                     </Button>
                   </div>
@@ -168,41 +215,44 @@ export function Usuarios() {
         )}
       </main>
 
-      {/* Modal Form */}
+      {/* User Form Modal */}
       {isModalOpen && (
-        <div className="modal-overlay">
-          <Card className="modal-content">
+        <div className="modal-overlay" onClick={closeModal}>
+          <Card className="modal-content glass" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{editingUser ? 'Editar Usuário' : 'Novo Usuário'}</h2>
-              <button className="close-btn" onClick={closeModal}><X size={24} /></button>
+              <button className="close-btn" onClick={closeModal}><X size={18} /></button>
             </div>
             <form onSubmit={handleSave} className="modal-form">
-              <Input 
-                label="Nome" 
-                value={formData.nome} 
-                onChange={e => setFormData({...formData, nome: e.target.value})} 
-                required 
+              <Input
+                label="Nome Completo"
+                value={formData.nome}
+                placeholder="Nome do usuário"
+                onChange={e => setFormData({ ...formData, nome: e.target.value })}
+                required
               />
-              <Input 
-                label="E-mail" 
-                type="email" 
-                value={formData.email} 
-                onChange={e => setFormData({...formData, email: e.target.value})} 
-                required 
+              <Input
+                label="E-mail"
+                type="email"
+                value={formData.email}
+                placeholder="email@exemplo.com"
+                onChange={e => setFormData({ ...formData, email: e.target.value })}
+                required
               />
-              <Input 
-                label={editingUser ? "Nova Senha (opcional)" : "Senha"} 
-                type="password" 
-                value={formData.senha} 
-                onChange={e => setFormData({...formData, senha: e.target.value})} 
-                required={!editingUser} 
+              <Input
+                label={editingUser ? 'Nova Senha (opcional)' : 'Senha'}
+                type="password"
+                placeholder={editingUser ? 'Deixe em branco para manter a senha atual' : 'Mínimo 6 caracteres'}
+                value={formData.senha}
+                onChange={e => setFormData({ ...formData, senha: e.target.value })}
+                required={!editingUser}
               />
               <div className="input-group">
-                <label>Perfil</label>
-                <select 
-                  className="cargo-select" 
-                  value={formData.perfil} 
-                  onChange={e => setFormData({...formData, perfil: e.target.value})}
+                <label>Perfil de Acesso</label>
+                <select
+                  className="cargo-select"
+                  value={formData.perfil}
+                  onChange={e => setFormData({ ...formData, perfil: e.target.value })}
                 >
                   <option value="CIDADAO">Cidadão</option>
                   <option value="ADMIN">Administrador</option>
@@ -210,7 +260,7 @@ export function Usuarios() {
               </div>
               <div className="modal-actions">
                 <Button variant="secondary" type="button" onClick={closeModal}>Cancelar</Button>
-                <Button type="submit">Salvar</Button>
+                <Button type="submit">{editingUser ? 'Salvar Alterações' : 'Criar Usuário'}</Button>
               </div>
             </form>
           </Card>
