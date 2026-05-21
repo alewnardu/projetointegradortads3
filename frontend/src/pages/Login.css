@@ -26,7 +26,6 @@
 .icon-container {
   display: inline-flex;
   margin-bottom: var(--spacing-xs);
-  animation: float-blob 6s infinite alternate ease-in-out;
 }
 
 .login-logo {
