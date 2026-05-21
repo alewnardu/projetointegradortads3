@@ -10,6 +10,7 @@ from app.seeds.endereco_seed import seed_enderecos
 from app.seeds.localizacao_seed import seed_localizacoes
 from app.seeds.fotografia_seed import seed_fotografias
 from app.seeds.brinquedoteca_seed import seed_brinquedotecas
+from app.seeds.avaliacao_seed import seed_avaliacoes
 
 app = create_app()
 
@@ -25,3 +26,4 @@ with app.app_context():
         seed_fotografias(indicacao)
     
     seed_brinquedotecas(indicacoes)
+    seed_avaliacoes(usuarios)
