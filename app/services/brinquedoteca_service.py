@@ -90,7 +90,8 @@ class BrinquedotecaService:
             
             db.session.commit()
 
-            return BrinquedotecaRepository.buscar_por_id(brinquedoteca_id)
+            db.session.refresh(brinquedoteca)
+            return brinquedoteca
         except Exception:
             db.session.rollback()
             raise

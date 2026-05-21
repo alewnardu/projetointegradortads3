@@ -30,7 +30,7 @@ class Config:
         'webp'
     }
 
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
 
     #Configurações de email
     MAIL_SERVER = os.getenv('MAIL_SERVER')

@@ -5,6 +5,7 @@ from marshmallow import (
     validates,
     ValidationError
 )
+from app.schemas.usuario_schema import UsuarioSchema
 
 class AvaliacaoSchema(Schema):
 
@@ -42,6 +43,12 @@ class AvaliacaoSchema(Schema):
     )
 
     usuario_avaliador_id = fields.Integer(
+        dump_only=True
+    )
+
+    usuario_avaliador = fields.Nested(
+        UsuarioSchema,
+        only=('id', 'nome'),
         dump_only=True
     )
 
