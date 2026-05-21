@@ -3,16 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
+import { useToast } from '../components/Toast';
 import './Login.css';
 
 export function Login() {
   const [isRegistering, setIsRegistering] = useState(false);
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   // Login state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
   const [isLoginLoading, setIsLoginLoading] = useState(false);
 
   // Register state
@@ -20,13 +21,10 @@ export function Login() {
   const [regEmail, setRegEmail] = useState('');
   const [regSenha, setRegSenha] = useState('');
   const [regConfirmaSenha, setRegConfirmaSenha] = useState('');
-  const [regError, setRegError] = useState('');
-  const [regSuccess, setRegSuccess] = useState('');
   const [isRegLoading, setIsRegLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoginError('');
     setIsLoginLoading(true);
 
     try {
@@ -47,9 +45,15 @@ export function Login() {
         localStorage.setItem('user', JSON.stringify(data.data));
       }
 
-      navigate('/dashboard');
+      showToast(`Bem-vindo, ${data.data?.nome || 'Usuário'}!`, 'success');
+
+      if (data.data && data.data.perfil === 'CIDADAO') {
+        navigate('/brinquedos');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
-      setLoginError(err.message);
+      showToast(err.message, 'error');
     } finally {
       setIsLoginLoading(false);
     }
@@ -57,12 +61,10 @@ export function Login() {
 
   const handleCadastro = async (e) => {
     e.preventDefault();
-    setRegError('');
-    setRegSuccess('');
     setIsRegLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/cadastro', {
+      const response = await fetch('http://localhost:5000/primeiro-acesso', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -79,7 +81,7 @@ export function Login() {
         throw new Error(data.error || 'Erro ao realizar cadastro.');
       }
 
-      setRegSuccess('Cadastro realizado com sucesso! Faça login para continuar.');
+      showToast('Cadastro realizado com sucesso! Faça login para continuar.', 'success');
       setRegNome('');
       setRegEmail('');
       setRegSenha('');
@@ -87,10 +89,9 @@ export function Login() {
 
       setTimeout(() => {
         setIsRegistering(false);
-        setRegSuccess('');
-      }, 2000);
+      }, 1000);
     } catch (err) {
-      setRegError(err.message);
+      showToast(err.message, 'error');
     } finally {
       setIsRegLoading(false);
     }
@@ -98,13 +99,17 @@ export function Login() {
 
   const switchMode = () => {
     setIsRegistering(!isRegistering);
-    setLoginError('');
-    setRegError('');
-    setRegSuccess('');
   };
 
   return (
     <div className="login-container">
+      {/* Background Animated Morphing Blobs */}
+      <div className="blob-container">
+        <div className="blob blob-orange" />
+        <div className="blob blob-green" />
+        <div className="blob blob-yellow" />
+      </div>
+
       <div className="login-content">
         <div className="login-header">
           <div className="icon-container">
@@ -114,9 +119,10 @@ export function Login() {
           <p>{isRegistering ? 'Crie sua conta de cidadão' : 'Acesse o sistema da Brinquedoteca'}</p>
         </div>
 
-        <Card className="login-card">
+        <Card className="login-card glass">
           {/* Tab switcher */}
           <div className="auth-tabs">
+            <div className={`auth-tabs-slider ${isRegistering ? 'register' : 'login'}`} />
             <button
               className={`auth-tab ${!isRegistering ? 'active' : ''}`}
               onClick={() => !isRegistering || switchMode()}
@@ -135,7 +141,6 @@ export function Login() {
 
           {!isRegistering ? (
             <form onSubmit={handleLogin} className="auth-form">
-              {loginError && <div className="login-error">{loginError}</div>}
               <Input
                 label="E-mail"
                 type="email"
@@ -160,8 +165,6 @@ export function Login() {
             </form>
           ) : (
             <form onSubmit={handleCadastro} className="auth-form">
-              {regError && <div className="login-error">{regError}</div>}
-              {regSuccess && <div className="login-success">{regSuccess}</div>}
               <Input
                 label="Nome completo"
                 type="text"
