@@ -65,8 +65,18 @@ export function Dashboard() {
           </div>
         )}
         {user?.perfil === 'CIDADAO' && (
-          <div className="dashboard-content">
-            {/* Espaço reservado para listar as brinquedotecas futuramente */}
+          <div className="dashboard-grid">
+            <Card className="dashboard-card action-card">
+              <h2>Ver Brinquedotecas</h2>
+              <p>Explore as brinquedotecas de Palmas, veja fotos, localizações e avaliações.</p>
+              <Button onClick={() => navigate('/brinquedos', { state: { activeTab: 'explore' } })}>Acessar</Button>
+            </Card>
+
+            <Card className="dashboard-card action-card">
+              <h2>Indicar Novo Espaço</h2>
+              <p>Recomende uma nova área de lazer pública ou parquinho infantil.</p>
+              <Button onClick={() => navigate('/brinquedos', { state: { activeTab: 'recommend' } })}>Indicar</Button>
+            </Card>
           </div>
         )}
       </main>

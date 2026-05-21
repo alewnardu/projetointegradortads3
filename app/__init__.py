@@ -1,4 +1,5 @@
-from flask import Flask
+from flask import Flask, send_from_directory
+import os
 from flask_cors import CORS
 from app.extensions import db, migrate, jwt, mail
 from app.blueprints import lista_blueprints
@@ -21,4 +22,8 @@ def create_app():
     for blueprint in lista_blueprints():
         app.register_blueprint(blueprint)
 
-    return app
+    @app.route('/uploads/<path:filename>', methods=['GET'])
+    def servir_upload(filename):
+        return send_from_directory(os.path.join(app.root_path, '..', 'uploads'), filename)
+
+    return app

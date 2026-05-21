@@ -15,7 +15,7 @@ export function Usuarios() {
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
-  const [formData, setFormData] = useState({ nome: '', email: '', senha: '', cargo: 'Comum' });
+  const [formData, setFormData] = useState({ nome: '', email: '', senha: '', perfil: 'CIDADAO' });
 
   const fetchUsuarios = async () => {
     try {
@@ -68,9 +68,9 @@ export function Usuarios() {
   const openModal = (user = null) => {
     setEditingUser(user);
     if (user) {
-      setFormData({ nome: user.nome, email: user.email, senha: '', cargo: user.cargo || 'Comum' });
+      setFormData({ nome: user.nome, email: user.email, senha: '', perfil: user.perfil || 'CIDADAO' });
     } else {
-      setFormData({ nome: '', email: '', senha: '', cargo: 'Comum' });
+      setFormData({ nome: '', email: '', senha: '', perfil: 'CIDADAO' });
     }
     setIsModalOpen(true);
   };
@@ -90,9 +90,19 @@ export function Usuarios() {
       
       const method = editingUser ? 'PATCH' : 'POST';
 
-      const payload = { ...formData };
-      if (editingUser && !payload.senha) {
-        delete payload.senha; // Don't send empty password if editing
+      const payload = {
+        nome: formData.nome,
+        email: formData.email,
+        perfil: formData.perfil
+      };
+      if (editingUser) {
+        if (formData.senha) {
+          payload.senha = formData.senha;
+          payload.confirmacao_senha = formData.senha;
+        }
+      } else {
+        payload.senha = formData.senha;
+        payload.confirmacao_senha = formData.senha;
       }
 
       const response = await fetch(url, {
@@ -141,7 +151,7 @@ export function Usuarios() {
                   <div className="usuario-info">
                     <h3>{usuario.nome}</h3>
                     <p>{usuario.email}</p>
-                    <span className="cargo-badge">{usuario.cargo || 'Comum'}</span>
+                    <span className="cargo-badge">{usuario.perfil === 'ADMIN' ? 'Administrador' : 'Cidadão'}</span>
                   </div>
                   <div className="usuario-actions">
                     <Button variant="secondary" onClick={() => openModal(usuario)}>
@@ -188,14 +198,14 @@ export function Usuarios() {
                 required={!editingUser} 
               />
               <div className="input-group">
-                <label>Cargo</label>
+                <label>Perfil</label>
                 <select 
                   className="cargo-select" 
-                  value={formData.cargo} 
-                  onChange={e => setFormData({...formData, cargo: e.target.value})}
+                  value={formData.perfil} 
+                  onChange={e => setFormData({...formData, perfil: e.target.value})}
                 >
-                  <option value="Comum">Comum</option>
-                  <option value="Administrador">Administrador</option>
+                  <option value="CIDADAO">Cidadão</option>
+                  <option value="ADMIN">Administrador</option>
                 </select>
               </div>
               <div className="modal-actions">

@@ -47,7 +47,11 @@ export function Login() {
         localStorage.setItem('user', JSON.stringify(data.data));
       }
 
-      navigate('/dashboard');
+      if (data.data && data.data.perfil === 'CIDADAO') {
+        navigate('/brinquedos');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setLoginError(err.message);
     } finally {
@@ -62,7 +66,7 @@ export function Login() {
     setIsRegLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/cadastro', {
+      const response = await fetch('http://localhost:5000/primeiro-acesso', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
