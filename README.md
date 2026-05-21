@@ -78,12 +78,23 @@ Crie um arquivo `.env` na raiz do projeto utilizando o arquivo `.env-exemplo` co
 Exemplo:
 
 ```env
-FLASK_APP=run.py
-FLASK_ENV=development
-
 DATABASE_URL=mysql+pymysql://usuario:senha@localhost/brinquedoteca
 
-JWT_SECRET_KEY=sua_chave_secreta
+JWT_SECRET_KEY=secret_key_gerada_pelo_python
+
+FLASK_APP=run.py 
+FLASK_ENV=development 
+
+LOCAL_APP_URL=http://localhost:5000
+
+MAIL_SERVER = 'smtp.gmail.com'
+MAIL_PORT = 587
+MAIL_USE_TLS = True
+
+MAIL_USERNAME = 'email@gmail.com'
+MAIL_PASSWORD = '****************'
+
+MAIL_DEFAULT_SENDER = ('Projeto TADS - TO Brincando', 'email@gmail.com')
 ```
 
 ---
@@ -118,6 +129,14 @@ Para iniciar o servidor localmente, execute:
 flask run
 ```
 
+### Popular o banco com dados fake
+
+Execute o comando para gerar dados fake para as tabelas do banco:
+
+```bash
+python brinquedoteca_seed
+```
+
 A aplicação estará disponível em:
 
 ```txt
@@ -134,16 +153,19 @@ app/
 ├── repositories/
 ├── routes/
 ├── schemas/
+├── seeds/
 ├── services/
 ├── blueprints.py
 ├── config.py
-├── extensions.py
 ├── exceptions.py
+├── extension.py
 └── __init__.py
-
+frontend/
 migrations/
+uploads/
 .env-exemplo
 .gitignore
+brinquedoteca_seed.py
 LICENSE
 README.md
 requirements.txt
@@ -177,9 +199,9 @@ Verifique:
 
 ---
 
-### Erro ao executar migrations
+### Erro ao executar as migrations
 
-Execute novamente:
+Execute novamente o comando para gerar as tabelas em seu banco local:
 
 ```bash
 flask db upgrade
