@@ -110,13 +110,13 @@ export function Brinquedos() {
     setError('');
 
     try {
-      const playroomsRes = await fetch('http://localhost:5000/brinquedotecas');
+      const playroomsRes = await fetch('/api/brinquedotecas');
       const playroomsData = await playroomsRes.json();
       if (!playroomsRes.ok) throw new Error(playroomsData.error || 'Erro ao buscar brinquedotecas');
       setBrinquedotecas(playroomsData.data || []);
 
       const reqHeaders = { 'Authorization': `Bearer ${token}` };
-      const indicacoesRes = await fetch('http://localhost:5000/indicacoes', { headers: reqHeaders });
+      const indicacoesRes = await fetch('/api/indicacoes', { headers: reqHeaders });
       if (indicacoesRes.status !== 401 && indicacoesRes.status !== 403) {
         const indicacoesData = await indicacoesRes.json();
         if (indicacoesRes.ok) {
@@ -147,7 +147,7 @@ export function Brinquedos() {
     if (selectedBrinquedoteca) {
       const principal = selectedBrinquedoteca.indicacao?.fotografias?.find(f => f.is_principal)
         || selectedBrinquedoteca.indicacao?.fotografias?.[0];
-      setFeaturedPhotoUrl(principal ? `http://localhost:5000/${principal.caminho}` : '/placeholder-brinquedoteca.jpg');
+      setFeaturedPhotoUrl(principal ? `/api/${principal.caminho}` : '/placeholder-brinquedoteca.jpg');
     }
   }, [selectedBrinquedoteca]);
 
@@ -159,7 +159,7 @@ export function Brinquedos() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/brinquedotecas/${selectedBrinquedoteca.id}/inativar`, {
+      const response = await fetch(`/api/brinquedotecas/${selectedBrinquedoteca.id}/inativar`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -189,7 +189,7 @@ export function Brinquedos() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/brinquedotecas/${selectedBrinquedoteca.id}/avaliar`, {
+      const response = await fetch(`/api/brinquedotecas/${selectedBrinquedoteca.id}/avaliar`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -225,7 +225,7 @@ export function Brinquedos() {
     if (!ok) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/indicacoes/${id}/aprovar`, {
+      const response = await fetch(`/api/indicacoes/${id}/aprovar`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -252,7 +252,7 @@ export function Brinquedos() {
     if (!ok) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/indicacoes/${id}/rejeitar`, {
+      const response = await fetch(`/api/indicacoes/${id}/rejeitar`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -279,7 +279,7 @@ export function Brinquedos() {
     if (!ok) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/indicacoes/${id}/cancelar`, {
+      const response = await fetch(`/api/indicacoes/${id}/cancelar`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -318,7 +318,7 @@ export function Brinquedos() {
     formData.append('foto_principal', recommendPhoto);
 
     try {
-      const response = await fetch('http://localhost:5000/indicacoes', {
+      const response = await fetch('/api/indicacoes', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
@@ -536,7 +536,7 @@ export function Brinquedos() {
                       const rating = getAverageRating(b);
                       const principalPhoto = b.indicacao?.fotografias?.find(f => f.is_principal) || b.indicacao?.fotografias?.[0];
                       const photoUrl = principalPhoto
-                        ? `http://localhost:5000/${principalPhoto.caminho}`
+                        ? `/api/${principalPhoto.caminho}`
                         : '/placeholder-brinquedoteca.jpg';
 
                       return (
@@ -603,7 +603,7 @@ export function Brinquedos() {
                     {indicacoes.map(ind => {
                       const principalPhoto = ind.fotografias?.find(f => f.is_principal) || ind.fotografias?.[0];
                       const photoUrl = principalPhoto
-                        ? `http://localhost:5000/${principalPhoto.caminho}`
+                        ? `/api/${principalPhoto.caminho}`
                         : '/placeholder-brinquedoteca.jpg';
 
                       return (
@@ -658,7 +658,7 @@ export function Brinquedos() {
                     {indicacoes.map(ind => {
                       const principalPhoto = ind.fotografias?.find(f => f.is_principal) || ind.fotografias?.[0];
                       const photoUrl = principalPhoto
-                        ? `http://localhost:5000/${principalPhoto.caminho}`
+                        ? `/api/${principalPhoto.caminho}`
                         : '/placeholder-brinquedoteca.jpg';
 
                       return (
@@ -736,7 +736,7 @@ export function Brinquedos() {
                 {selectedBrinquedoteca.indicacao?.fotografias?.length > 1 && (
                   <div className="modal-gallery">
                     {selectedBrinquedoteca.indicacao.fotografias.map(photo => {
-                      const thumbUrl = `http://localhost:5000/${photo.caminho}`;
+                      const thumbUrl = `/api/${photo.caminho}`;
                       return (
                         <img
                           key={photo.id}
@@ -928,7 +928,7 @@ export function Brinquedos() {
               <div className="modal-body-left">
                 {(() => {
                   const principal = selectedIndicacao.fotografias?.find(f => f.is_principal) || selectedIndicacao.fotografias?.[0];
-                  const photoUrl = principal ? `http://localhost:5000/${principal.caminho}` : '/placeholder-brinquedoteca.jpg';
+                  const photoUrl = principal ? `/api/${principal.caminho}` : '/placeholder-brinquedoteca.jpg';
                   return <img src={photoUrl} alt="Foto Principal" className="modal-featured-image" />;
                 })()}
 
@@ -953,7 +953,7 @@ export function Brinquedos() {
                       {selectedIndicacao.fotografias.map(photo => (
                         <img
                           key={photo.id}
-                          src={`http://localhost:5000/${photo.caminho}`}
+                          src={`/api/${photo.caminho}`}
                           alt="Foto"
                           className="modal-gallery-thumb"
                         />

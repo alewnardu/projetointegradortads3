@@ -17,7 +17,7 @@ class Config:
     
     SECRET_KEY = os.getenv('SECRET_KEY') or 'secret'
 
-    LOCAL_APP_URL = os.getenv('LOCAL_APP_URL', 'http://localhost:5000')
+    LOCAL_APP_URL = os.getenv('LOCAL_APP_URL', 'http://127.0.0.1:5000')
     
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024
 

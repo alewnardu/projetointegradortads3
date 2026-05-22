@@ -35,7 +35,7 @@ export function Usuarios() {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/usuarios', {
+      const response = await fetch('/api/usuarios', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -65,7 +65,7 @@ export function Usuarios() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/usuarios/${id}`, {
+      const response = await fetch(`/api/usuarios/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -102,8 +102,8 @@ export function Usuarios() {
     try {
       const token = localStorage.getItem('token');
       const url = editingUser
-        ? `http://localhost:5000/usuarios/${editingUser.id}`
-        : 'http://localhost:5000/usuarios';
+        ? `/api/usuarios/${editingUser.id}`
+        : '/api/usuarios';
 
       const method = editingUser ? 'PATCH' : 'POST';
 
