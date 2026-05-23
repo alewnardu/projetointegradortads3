@@ -35,9 +35,9 @@ services:
       - mysql
 
     environment:
-      DB_HOST: ${MYSQL_PASSWORD}
+      DB_HOST: ${MYSQL_HOST}
       DB_PORT: 3306
-      DB_NAME: ${MYSQL_NAME}
+      DB_NAME: ${MYSQL_DATABASE}
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
 
