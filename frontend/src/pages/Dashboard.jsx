@@ -88,7 +88,7 @@ export function Dashboard() {
               </div>
               <h2>Gerenciar Brinquedos</h2>
               <p>Controle as brinquedotecas ativas e gerencie as fotos, observações e análises de inativação.</p>
-              <Button onClick={() => navigate('/brinquedos')}>Acessar Acervo</Button>
+              <Button onClick={() => navigate('/brinquedotecas')}>Acessar Acervo</Button>
             </Card>
           </div>
         )}
@@ -101,7 +101,7 @@ export function Dashboard() {
               </div>
               <h2>Ver Brinquedotecas</h2>
               <p>Explore as brinquedotecas de Palmas, veja especificações completas, fotos reais, rotas e avaliações.</p>
-              <Button onClick={() => navigate('/brinquedos', { state: { activeTab: 'explore' } })}>Acessar Mapa</Button>
+              <Button onClick={() => navigate('/brinquedotecas', { state: { activeTab: 'explore' } })}>Acessar Mapa</Button>
             </Card>
 
             <Card className="action-card" hoverable>
@@ -110,7 +110,7 @@ export function Dashboard() {
               </div>
               <h2>Indicar Novo Espaço</h2>
               <p>Recomende uma nova área de lazer pública, praça infantil ou parquinho para transformarmos em brinquedoteca.</p>
-              <Button onClick={() => navigate('/brinquedos', { state: { activeTab: 'recommend' } })}>Fazer Indicação</Button>
+              <Button onClick={() => navigate('/brinquedotecas', { state: { activeTab: 'recommend' } })}>Fazer Indicação</Button>
             </Card>
           </div>
         )}
