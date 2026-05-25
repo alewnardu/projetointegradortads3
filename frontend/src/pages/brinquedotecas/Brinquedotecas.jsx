@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card } from '../../components/Card';
 import { Button } from '../../components/Button';
@@ -10,7 +10,7 @@ import {
   ArrowLeft, ArrowRight, Star, MapPin, SlidersHorizontal, Plus,
   Sparkles, ShieldCheck, X, Check, Trash, Ban, MessageSquare,
   DoorOpen, DoorClosed, ChevronDown, Wind, Users, Heart, Upload, Search,
-  Inbox, BarChart3 
+  Inbox, BarChart3
 } from 'lucide-react';
 import './Brinquedotecas.css';
 
@@ -59,8 +59,8 @@ export function Brinquedotecas() {
 
   // Recommendation Form State
   const [isRecommendModalOpen, setIsRecommendModalOpen] = useState(false);
-  const [recommendPhoto, setRecommendPhoto] = useState(null);
-  const [recommendPhotoPreview, setRecommendPhotoPreview] = useState('');
+  const [recommendPhotos, setRecommendPhotos] = useState([]);
+  const [recommendPhotoPreviews, setRecommendPhotoPreviews] = useState([]);
   const [recommendData, setRecommendData] = useState({
     nome: '',
     descricao: '',
@@ -90,7 +90,34 @@ export function Brinquedotecas() {
   const [filterGratuito, setFilterGratuito] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(true);
 
-  const fetchData = async () => {
+  const handlePhotosChange = (event) => {
+    const files = Array.from(event.target.files);
+
+    if (files.length > 5) {
+      showToast(
+        'Selecione no máximo 5 imagens.',
+        'error'
+      );
+      return;
+    }
+
+    setRecommendPhotos(files);
+
+    setRecommendPhotoPreviews(
+      files.map(file => URL.createObjectURL(file))
+    );
+  };
+
+  useEffect(() => {
+    return () => {
+      recommendPhotoPreviews.forEach(url => {
+        URL.revokeObjectURL(url);
+      });
+    };
+  }, [recommendPhotoPreviews]);
+
+  const fetchData = useCallback(async () => {
+
     setLoading(true);
     setError('');
 
@@ -128,11 +155,11 @@ export function Brinquedotecas() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchData();
-  }, [token]);
+  }, [fetchData]);
 
 
 
@@ -289,8 +316,11 @@ export function Brinquedotecas() {
 
   const handleRecommendSubmit = async (e) => {
     e.preventDefault();
-    if (!recommendPhoto) {
-      showToast('Por favor, faça upload de uma foto principal do local.', 'warning');
+    if (recommendPhotos.length === 0) {
+      showToast(
+        'Por favor, faça upload de uma foto principal do local.',
+        'warning'
+      );
       return;
     }
 
@@ -307,7 +337,20 @@ export function Brinquedotecas() {
 
     const formData = new FormData();
     formData.append('dados', JSON.stringify(payload));
-    formData.append('foto_principal', recommendPhoto);
+    formData.append(
+      'foto_principal',
+      recommendPhotos[0]
+    );
+
+    recommendPhotos
+      .slice(1)
+      .forEach(foto => {
+        formData.append(
+          'fotos_adicionais',
+          foto
+        );
+      });
+
 
     try {
       const response = await authFetch(`/api/indicacoes`, {
@@ -320,8 +363,8 @@ export function Brinquedotecas() {
 
       showToast('Indicação enviada com sucesso para análise! Obrigado pela contribuição.', 'success');
       setIsRecommendModalOpen(false);
-      setRecommendPhoto(null);
-      setRecommendPhotoPreview('');
+      setRecommendPhotos([]);
+      setRecommendPhotoPreviews([]);
       setRecommendData({
         nome: '', descricao: '', tem_climatizacao: false,
         tem_monitores: false, tem_gratuidade: false, porte: 'MEDIO',
@@ -334,16 +377,6 @@ export function Brinquedotecas() {
       fetchData();
     } catch (err) {
       showToast(err.message, 'error');
-    }
-  };
-
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setRecommendPhoto(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setRecommendPhotoPreview(reader.result);
-      reader.readAsDataURL(file);
     }
   };
 
@@ -427,7 +460,7 @@ export function Brinquedotecas() {
         <div className="tabs-right" style={{ marginLeft: 'auto' }}>
           {user && user?.perfil === 'ADMIN' && (
             <Button variant="secondary" onClick={() => navigate('/dashboard')} className="back-btn" style={{ marginTop: '10px', marginLeft: '5px' }}>
-              <BarChart3  size={16} /> Dashboard
+              <BarChart3 size={16} /> Dashboard
             </Button>
           )}
 
@@ -1039,9 +1072,9 @@ export function Brinquedotecas() {
           setIsRecommendModalOpen={setIsRecommendModalOpen}
           handleRecommendSubmit={handleRecommendSubmit}
           setRecommendData={setRecommendData}
-          recommendPhotoPreview={recommendPhotoPreview}
-          recommendPhoto={recommendPhoto}
-          handlePhotoChange={handlePhotoChange}
+          photos={recommendPhotos}
+          photoPreviews={recommendPhotoPreviews}
+          handlePhotosChange={handlePhotosChange}
         />
       )}
     </div>

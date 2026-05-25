@@ -1,11 +1,17 @@
 from app.models.brinquedoteca import Brinquedoteca
+from app.models.indicacao import Indicacao
 from app.extensions import db
 
 class BrinquedotecaRepository:
     
     @staticmethod
     def listar():
-        return Brinquedoteca.query.all()
+        return (
+            Brinquedoteca.query
+            .join(Brinquedoteca.indicacao)
+            .order_by(Indicacao.data_aprovacao.desc())
+            .all()
+        )
 
     @staticmethod
     def buscar_por_id(brinquedoteca_id):
