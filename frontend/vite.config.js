@@ -7,7 +7,8 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     allowedHosts: [
-      'tobrincando.com.br'
+      'tobrincando.com.br',
+      'dev-tobrincando.com.br'
     ]
   }
 })
