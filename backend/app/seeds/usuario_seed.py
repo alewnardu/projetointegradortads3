@@ -23,7 +23,9 @@ def seed_usuarios(quantidade=10):
                 nome= integrante['nome'],
                 email=integrante['email'],
                 senha=generate_password_hash("teste@123"),
-                perfil="ADMIN"
+                perfil="ADMIN",
+                status=True,
+                data_inativacao=None
             )
             db.session.add(usuario)
             usuarios.append(usuario)
@@ -33,7 +35,10 @@ def seed_usuarios(quantidade=10):
             usuario = AutenticacaoService.primeiro_acesso({
                 "nome": fake.name(),
                 "email": fake.unique.email(),
-                "senha": "teste@123"
+                "senha": "teste@123",
+                "perfil": "CIDADAO",
+                "status": True,
+                "data_inativacao": None
             })
             db.session.add(usuario)
             usuarios.append(usuario)

@@ -87,7 +87,9 @@ class UsuarioService:
                 nome=dados['nome'],
                 email=dados['email'],
                 senha=senha_hash,
-                perfil=dados['perfil']
+                perfil=dados['perfil'],
+                status=True,
+                data_inativacao=None
             )
             UsuarioRepository.salvar(usuario)
             db.session.commit()
