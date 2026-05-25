@@ -47,11 +47,7 @@ export function Login() {
 
       showToast(`Bem-vindo, ${data.data?.nome || 'Usuário'}!`, 'success');
 
-      if (data.data && data.data.perfil === 'CIDADAO') {
-        navigate('/brinquedos');
-      } else {
-        navigate('/dashboard');
-      }
+      navigate('/brinquedotecas');
     } catch (err) {
       showToast(err.message, 'error');
     } finally {
