@@ -136,3 +136,36 @@ class UsuarioService:
         except Exception:
             db.session.rollback()
             raise
+
+    @staticmethod
+    def reativar_usuario(usuario_logado_id, usuario_id):
+        try:
+            usuario_logado = UsuarioRepository.buscar_por_id(usuario_logado_id)
+            
+            if not usuario_logado:
+                raise UnauthorizedError('Acesso negado! Esta funcionalidade requer autenticação')
+
+            usuario = UsuarioRepository.buscar_por_id(usuario_id)
+
+            if not usuario:
+                raise NotFoundError('Usuário não encontrado')
+            
+            if usuario.id != usuario_logado.id and usuario_logado.perfil != 'ADMIN':
+                raise ForbiddenError('Acesso negado: Você não tem permissão para reativar este usuário')
+
+            if usuario.status:
+                raise ValidationError(
+                    'O usuário já está ativo'
+                )
+
+            usuario.status = True
+            usuario.data_inativacao = None
+
+            UsuarioRepository.salvar(usuario)
+
+            db.session.commit()
+            
+            return True
+        except Exception:
+            db.session.rollback()
+            raise

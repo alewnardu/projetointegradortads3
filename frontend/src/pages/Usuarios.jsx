@@ -8,7 +8,7 @@ import { useConfirm } from '../components/ConfirmModal';
 import './Usuarios.css';
 import { useAuthenticatedFetch } from '../hooks/useAuthenticatedFetch';
 import { useAuth } from '../hooks/useAuth';
-import { SlidersHorizontal, ChevronDown , Search, ArrowLeft, UserPlus, Edit2, Trash2, X, ShieldCheck, User, DoorOpen, DoorClosed, Plus, BarChart3 } from 'lucide-react';
+import { SlidersHorizontal, ChevronDown, Search, ArrowLeft, UserPlus, RotateCcw, Edit2, Trash2, X, ShieldCheck, User, DoorOpen, DoorClosed, Plus, BarChart3 } from 'lucide-react';
 
 export function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
@@ -68,6 +68,37 @@ export function Usuarios() {
   useEffect(() => {
     fetchUsuarios();
   }, [user]);
+
+  const handleReativar = async (id, nome) => {
+    const ok = await confirm({
+      title: 'Reativar Usuário',
+      message: `Deseja reativar o usuário "${nome}"?`,
+      confirmText: 'Sim, Reativar',
+      cancelText: 'Cancelar',
+    });
+
+    if (!ok) return;
+
+    try {
+      const response = await authFetch(`/api/usuarios/${id}/reativar`, {
+        method: 'PATCH',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Erro ao reativar usuário');
+      }
+
+      fetchUsuarios();
+
+      showToast(
+        `Usuário "${nome}" reativado com sucesso.`,
+        'success'
+      );
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
 
   const handleDelete = async (id, nome) => {
     const ok = await confirm({
@@ -286,7 +317,7 @@ export function Usuarios() {
                 >
                   <option value="ALL">Todos</option>
                   <option value="ATIVO">Ativos</option>
-                  <option value="INATIVO">Inativos</option>
+                  <option value="INATIVO">Excluídos</option>
                 </select>
               </div>
 
@@ -332,19 +363,28 @@ export function Usuarios() {
                             {usuario.perfil === 'ADMIN' ? <><ShieldCheck size={11} /> Administrador</> : <><User size={11} /> Cidadão</>}
                           </span>
                           <span className={`role-badge ${usuario.status ? 'success' : 'danger'}`} style={{ marginLeft: '5px' }}>
-                            <ShieldCheck size={11} /> {usuario.status ? "ATIVO" : "INATIVO"}
+                            <ShieldCheck size={11} /> {usuario.status ? "ATIVO" : "EXCLUÍDO"}
                           </span>
+                          {!usuario.status && usuario.data_inativacao && (
+                            <p><small>Momento da exclusão: {new Date(usuario.data_inativacao).toLocaleString('pt-BR')}</small></p>
+                          )}
                         </div>
 
                       </div>
                     </div>
                     <div className="usuario-actions">
-                      <Button variant="secondary" className="edit-btn" onClick={() => openModal(usuario)} title="Editar usuário">
-                        <Edit2 size={16} />
-                      </Button>
-                      <Button variant="secondary" className="delete-btn" onClick={() => handleDelete(usuario.id, usuario.nome)} title="Excluir usuário">
-                        <Trash2 size={16} />
-                      </Button>
+                      {usuario.id && usuario.status && (
+                        <><Button variant="secondary" className="edit-btn" onClick={() => openModal(usuario)} title="Editar usuário">
+                          <Edit2 size={16} />
+                        </Button>
+                          <Button variant="secondary" className="delete-btn" onClick={() => handleDelete(usuario.id, usuario.nome)} title="Excluir usuário">
+                            <Trash2 size={16} />
+                          </Button></>
+                      )}
+                      {usuario.id && !usuario.status && (
+                        <Button variant="secondary" className="edit-btn" onClick={() => handleReativar(usuario.id, usuario.nome)} title="Reverter exclusão">
+                          <RotateCcw size={16} />
+                        </Button>)}
                     </div>
                   </Card>
                 ))
