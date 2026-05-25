@@ -169,7 +169,7 @@ def alterar_dados_usuario(usuario_id):
             'error': 'Erro interno do servidor'
         }), 500
 
-@usuario_bp.route('/api/usuarios/<int:usuario_id>/reativar', methods=['PATCH'])
+@usuario_bp.route('/usuarios/<int:usuario_id>/reativar', methods=['PATCH'])
 @jwt_required()
 def reativar_usuario(usuario_id):
 
