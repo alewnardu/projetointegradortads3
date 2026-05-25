@@ -50,7 +50,11 @@ class UsuarioService:
             if usuario.id != usuario_logado.id and usuario_logado.perfil != 'ADMIN':
                 raise ForbiddenError('Acesso negado: Você não tem permissão para acessar os dados deste usuário')
 
-            UsuarioRepository.deletar(usuario)
+            usuario.status = False
+            usuario.data_inativacao = datetime.utcnow()
+
+            UsuarioRepository.salvar(usuario)
+
             db.session.commit()
             
             return True
