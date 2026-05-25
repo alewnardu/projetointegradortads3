@@ -1,10 +1,22 @@
 # Projeto Integrador TADS 3
 
-Aplicação web desenvolvida para gerenciamento de brinquedotecas, permitindo cadastro, consulta e gerenciamento de informações por diferentes perfis de usuários.
+Aplicação web para gerenciamento de brinquedotecas, permitindo o cadastro, consulta e administração de informações por diferentes perfis de usuários.
 
 ---
 
-## Tecnologias utilizadas
+# Estrutura do Projeto
+
+<p align="center">
+  <img src="estruturadoprojeto.png" alt="Estrutura do Projeto" width="800">
+</p>
+
+<p align="center">
+  <em>Figura 1 - Estrutura geral da aplicação.</em>
+</p>
+
+# Tecnologias
+
+## Backend (API)
 
 - Python 3.11
 - Flask
@@ -15,21 +27,31 @@ Aplicação web desenvolvida para gerenciamento de brinquedotecas, permitindo ca
 - JWT Authentication
 - Alembic
 
----
+## Infraestrutura e Ambiente
 
-## Pré-requisitos
-
-Antes de executar o projeto, é necessário possuir instalado em sua máquina:
-
-- Python 3.11 ou superior
-- MySQL
+- Docker
+- Docker Compose
+- Nginx
 - Git
 
 ---
 
-## Clonando o repositório
+# Pré-requisitos
 
-Clone o repositório utilizando o comando abaixo:
+Certifique-se de possuir as seguintes ferramentas instaladas:
+
+| Ferramenta | Versão Recomendada |
+|------------|-------------------|
+| Python | 3.11 ou superior |
+| Git | 2.54 ou superior |
+| Docker | 29.4.3 ou superior |
+| Docker Compose | Compatível com Docker instalado |
+
+---
+
+# Clonando o Repositório
+
+Clone o projeto:
 
 ```bash
 git clone https://github.com/alewnardu/projetointegradortads3.git
@@ -43,37 +65,9 @@ cd projetointegradortads3
 
 ---
 
-## Criando o ambiente virtual
+# Configuração das Variáveis de Ambiente
 
-### Windows
-
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-### Linux/macOS
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
----
-
-## Instalando as dependências
-
-Com o ambiente virtual ativado, execute:
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## Configurando as variáveis de ambiente
-
-Crie um arquivo `.env` na raiz do projeto utilizando o arquivo `.env-exemplo` como base.
+Crie um arquivo `.env` na raiz do projeto utilizando o arquivo `.env-exemplo` como modelo.
 
 Exemplo:
 
@@ -82,133 +76,208 @@ DATABASE_URL=mysql+pymysql://usuario:senha@localhost/brinquedoteca
 
 JWT_SECRET_KEY=secret_key_gerada_pelo_python
 
-FLASK_APP=run.py 
-FLASK_ENV=development 
+FLASK_APP=run.py
+FLASK_ENV=development
 
-LOCAL_APP_URL=http://localhost:5000
+LOCAL_APP_URL=http://flask_api:5000
 
-MAIL_SERVER = 'smtp.gmail.com'
-MAIL_PORT = 587
-MAIL_USE_TLS = True
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_PASSWORD=****************
+MAIL_DEFAULT_SENDER=Projeto TADS - TO Brincando
+MAIL_USERNAME=email@gmail.com
 
-MAIL_USERNAME = 'email@gmail.com'
-MAIL_PASSWORD = '****************'
-
-MAIL_DEFAULT_SENDER = ('Projeto TADS - TO Brincando', 'email@gmail.com')
+MYSQL_USER=user
+MYSQL_ROOT_PASSWORD=rootpassword
+MYSQL_HOST=mysql
+MYSQL_PASSWORD=password
+MYSQL_DATABASE=brinquedoteca
 ```
 
 ---
 
-## Configurando o banco de dados
+# Executando o Projeto
 
-Em sua instância do MySQL, execute o comando abaixo para criar o banco de dados:
+## 1. Subir os containers
 
-```sql
-CREATE DATABASE brinquedoteca;
+```bash
+docker compose up -d
+```
+
+## 2. Verificar os containers em execução
+
+```bash
+docker ps
+```
+
+## 3. Executar as migrações do banco de dados
+
+```bash
+docker exec -it flask_api flask db upgrade
+```
+
+## 4. Popular o banco de dados
+
+```bash
+docker exec -it flask_api python3 brinquedoteca_seed.py
 ```
 
 ---
 
-## Executando as migrações
+# Configuração de DNS Local (Arquivo Hosts)
 
-As migrações do banco de dados já estão versionadas no repositório.
+Para simular a resolução de nomes DNS localmente, adicione uma das entradas abaixo ao arquivo `hosts` do sistema operacional.
 
-Execute o comando abaixo para aplicar as migrations existentes:
+## Linux
 
-```bash
-flask db upgrade
-```
-
----
-
-## Executando a aplicação
-
-Para iniciar o servidor localmente, execute:
+Arquivo:
 
 ```bash
-flask run
+/etc/hosts
 ```
 
-### Popular o banco com dados fake
+## Windows
 
-Execute o comando para gerar dados fake para as tabelas do banco:
-
-```bash
-python brinquedoteca_seed
-```
-
-A aplicação estará disponível em:
+Arquivo:
 
 ```txt
-http://localhost:5000/
+C:\Windows\System32\drivers\etc\hosts
+```
+
+Adicione uma ou mais das linhas abaixo:
+
+```txt
+127.0.0.1    tobrincando.com.br
+127.0.0.1    www.tobrincando.com.br
+127.0.0.1    dev-tobrincando.com.br
 ```
 
 ---
 
-## Estrutura do projeto
+# Acessando a Aplicação
+
+## Backend (API)
 
 ```txt
-app/
-├── models/
-├── repositories/
-├── routes/
-├── schemas/
-├── seeds/
-├── services/
-├── blueprints.py
-├── config.py
-├── exceptions.py
-├── extension.py
-└── __init__.py
+http://localhost:5000
+```
+
+## Frontend
+
+```txt
+http://tobrincando.com.br
+http://www.tobrincando.com.br
+http://dev-tobrincando.com.br
+```
+
+---
+
+# Estrutura do Projeto
+
+```text
+backend/
+├── app/
+│   ├── models/
+│   ├── repositories/
+│   ├── routes/
+│   ├── schemas/
+│   ├── seeds/
+│   ├── services/
+│   ├── __init__.py
+│   ├── blueprints.py
+│   ├── config.py
+│   ├── exceptions.py
+│   └── extension.py
+├── migrations/
+├── uploads/
+├── brinquedoteca_seed.py
+├── Dockerfile
+├── requirements.txt
+├── run.py
+└── Tads Projeto Integrador Brinquedoteca.postman_collection.json
+
 frontend/
-migrations/
-uploads/
+├── public/
+├── src/
+├── Dockerfile
+├── eslint.config.js
+├── index.html
+├── package.json
+├── package-lock.json
+├── README.md
+└── vite.config.js
+
+nginx/
+└── default.conf
+
 .env-exemplo
 .gitignore
-brinquedoteca_seed.py
+docker-compose.yml
 LICENSE
 README.md
-requirements.txt
-run.py
-Tads Projeto Integrador Brinquedoteca.postman_collection
 ```
 
 ---
 
-## Arquitetura utilizada
+# Arquitetura da Aplicação
 
-O projeto utiliza arquitetura em camadas, separando responsabilidades entre:
+A API foi desenvolvida seguindo uma arquitetura em camadas, promovendo separação de responsabilidades e maior manutenibilidade.
 
-- Routes → definição das rotas da API
-- Services → regras de negócio
-- Repositories → acesso ao banco de dados
-- Models → entidades do sistema
-- Schemas → serialização e validação de dados
+| Camada | Responsabilidade |
+|----------|----------------|
+| Routes | Definição dos endpoints da API |
+| Services | Regras de negócio |
+| Repositories | Acesso e persistência de dados |
+| Models | Representação das entidades |
+| Schemas | Serialização e validação dos dados |
 
----
+Fluxo simplificado:
 
-## Problemas comuns
-
-### Erro de conexão com o banco
-
-Verifique:
-
-- se o MySQL está iniciado
-- se as credenciais do `.env` estão corretas
-- se o banco `brinquedoteca` foi criado
-
----
-
-### Erro ao executar as migrations
-
-Execute novamente o comando para gerar as tabelas em seu banco local:
-
-```bash
-flask db upgrade
+```text
+Request
+   ↓
+Routes
+   ↓
+Services
+   ↓
+Repositories
+   ↓
+Database
 ```
 
 ---
 
-## Licença
+# Problemas Comuns
 
-Este projeto está licenciado sob os termos da licença disponível no arquivo `LICENSE`.
+Antes de iniciar a depuração, verifique:
+
+- Os containers foram iniciados corretamente (`docker ps`);
+- O container MySQL está em execução;
+- As credenciais configuradas no arquivo `.env` estão corretas;
+- As migrações foram executadas com sucesso;
+- O script de carga inicial (`brinquedoteca_seed.py`) foi executado;
+- As entradas do arquivo `hosts` foram adicionadas corretamente;
+- As portas necessárias não estão sendo utilizadas por outros processos.
+
+---
+
+# Coleção Postman
+
+A coleção utilizada para testes da API encontra-se em:
+
+```text
+backend/Tads Projeto Integrador Brinquedoteca.postman_collection.json
+```
+
+Importe o arquivo no Postman para testar os endpoints disponíveis.
+
+---
+
+# Licença
+
+Este projeto está licenciado conforme os termos definidos no arquivo:
+
+```text
+LICENSE
+```
