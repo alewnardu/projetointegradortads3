@@ -1,8 +1,8 @@
-"""migracao geral atualizada
+"""empty message
 
-Revision ID: ce5978b9ba0e
+Revision ID: a5bb4656ca6e
 Revises: 
-Create Date: 2026-05-19 23:10:34.135219
+Create Date: 2026-05-25 12:44:19.309086
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ce5978b9ba0e'
+revision = 'a5bb4656ca6e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,6 +24,8 @@ def upgrade():
     sa.Column('email', sa.String(length=150), nullable=False),
     sa.Column('senha', sa.String(length=255), nullable=False),
     sa.Column('perfil', sa.Enum('CIDADAO', 'ADMIN', name='perfil_usuario_enum'), nullable=False),
+    sa.Column('status', sa.Boolean(), nullable=True),
+    sa.Column('data_inativacao', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )

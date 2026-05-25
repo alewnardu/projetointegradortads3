@@ -3,6 +3,7 @@ from app.models.usuario import Usuario
 from app.repositories.usuario_repository import UsuarioRepository
 from app.exceptions import *
 from app.extensions import db
+from datetime import datetime
 
 class UsuarioService:
 
