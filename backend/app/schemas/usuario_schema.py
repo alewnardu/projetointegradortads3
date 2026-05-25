@@ -13,6 +13,10 @@ class UsuarioSchema(Schema):
             'invalid': 'Email inválido'
         }
     )
+
+    status = fields.Boolean(dump_only=True)
+
+    data_inativacao = fields.DateTime(dump_only=True)
     
     senha = fields.String(
         required=True,
