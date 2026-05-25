@@ -5,35 +5,17 @@ import { Card } from '../components/Card';
 import { useToast } from '../components/Toast';
 import { LogOut, Users, TentTree, Search, PlusCircle } from 'lucide-react';
 import './Dashboard.css';
+import { useAuth } from '../hooks/useAuth';
 
 export function Dashboard() {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/brinquedotecas');
-      return;
-    }
-
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error('Error parsing user data', e);
-      }
-    }
-  }, [navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    showToast('Sessão encerrada com sucesso.', 'info');
-    navigate('/login');
-  };
+  const {
+      user,
+      token,
+      logout,
+      loading: authLoading
+    } = useAuth();
 
   return (
     <div className="dashboard-container">
@@ -51,7 +33,7 @@ export function Dashboard() {
         </div>
         <div className="dashboard-user">
           <span>Olá, {user?.nome || 'Usuário'}</span>
-          <Button variant="secondary" onClick={handleLogout} className="logout-btn">
+          <Button variant="secondary" onClick={logout} className="logout-btn">
             <LogOut size={16} />
             Sair
           </Button>
