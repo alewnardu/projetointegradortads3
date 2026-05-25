@@ -168,3 +168,33 @@ def alterar_dados_usuario(usuario_id):
         return jsonify({
             'error': 'Erro interno do servidor'
         }), 500
+
+@usuario_bp.route('/usuarios/<int:usuario_id>/reativar', methods=['PATCH'])
+@jwt_required()
+def reativar_usuario(usuario_id):
+
+    try:
+        usuario_logado_id = get_jwt_identity()
+        sucesso = UsuarioService.reativar_usuario(usuario_logado_id, usuario_id)
+        return '', 204
+        
+    except UnauthorizedError as e:
+        return jsonify({
+            'error': str(e)
+        }), 401
+    except ValidationError as e:
+        return jsonify({
+            'error': str(e)
+        }), 400
+    except ForbiddenError as e:
+        return jsonify({
+            'error': str(e)
+        }), 403
+    except NotFoundError as e:
+        return jsonify({
+            'error': str(e)
+        }), 404
+    except Exception:
+        return jsonify({
+            'error': 'Erro interno do servidor'
+        }), 500

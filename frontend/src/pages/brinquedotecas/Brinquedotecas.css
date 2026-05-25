@@ -108,7 +108,6 @@
 .brinquedos-main {
   flex: 1;
   padding: var(--spacing-xl) var(--spacing-xl);
-  max-width: 1200px;
   margin: 0 auto;
   width: 100%;
   z-index: 1;

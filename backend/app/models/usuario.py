@@ -15,6 +15,10 @@ class Usuario(db.Model):
     
     perfil = db.Column(Enum('CIDADAO', 'ADMIN', name="perfil_usuario_enum"), nullable=False, default='CIDADAO')
 
+    status = db.Column(db.Boolean, default=True)
+
+    data_inativacao = db.Column(db.DateTime, nullable=True)
+
     avaliacoes = db.relationship(
         'Avaliacao',
         back_populates='usuario_avaliador'

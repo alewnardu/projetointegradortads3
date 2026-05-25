@@ -21,7 +21,3 @@ class UsuarioRepository:
         db.session.add(usuario)
 
         return usuario
-
-    @staticmethod
-    def deletar(usuario):
-        db.session.delete(usuario)

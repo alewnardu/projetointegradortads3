@@ -21,6 +21,9 @@ class AutenticacaoService:
         if not usuario:
             raise AuthenticationError('Credenciais inválidas')
         
+        if usuario.status == False:
+            raise AuthenticationError('Usuário inativo. Entre em contato com o administrador para reativar sua conta.')
+        
         senha_valida = check_password_hash(
             usuario.senha,
             dados['senha']
