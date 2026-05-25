@@ -28,7 +28,7 @@ export function Login() {
     setIsLoginLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha: password }),
@@ -47,11 +47,7 @@ export function Login() {
 
       showToast(`Bem-vindo, ${data.data?.nome || 'Usuário'}!`, 'success');
 
-      if (data.data && data.data.perfil === 'CIDADAO') {
-        navigate('/brinquedos');
-      } else {
-        navigate('/dashboard');
-      }
+      navigate('/brinquedotecas');
     } catch (err) {
       showToast(err.message, 'error');
     } finally {
@@ -64,7 +60,7 @@ export function Login() {
     setIsRegLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/primeiro-acesso', {
+      const response = await fetch('/api/primeiro-acesso', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

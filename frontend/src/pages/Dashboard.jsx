@@ -5,35 +5,17 @@ import { Card } from '../components/Card';
 import { useToast } from '../components/Toast';
 import { LogOut, Users, TentTree, Search, PlusCircle } from 'lucide-react';
 import './Dashboard.css';
+import { useAuth } from '../hooks/useAuth';
 
 export function Dashboard() {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error('Error parsing user data', e);
-      }
-    }
-  }, [navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    showToast('Sessão encerrada com sucesso.', 'info');
-    navigate('/login');
-  };
+  const {
+      user,
+      token,
+      logout,
+      loading: authLoading
+    } = useAuth();
 
   return (
     <div className="dashboard-container">
@@ -51,7 +33,7 @@ export function Dashboard() {
         </div>
         <div className="dashboard-user">
           <span>Olá, {user?.nome || 'Usuário'}</span>
-          <Button variant="secondary" onClick={handleLogout} className="logout-btn">
+          <Button variant="secondary" onClick={logout} className="logout-btn">
             <LogOut size={16} />
             Sair
           </Button>
@@ -88,7 +70,7 @@ export function Dashboard() {
               </div>
               <h2>Gerenciar Brinquedos</h2>
               <p>Controle as brinquedotecas ativas e gerencie as fotos, observações e análises de inativação.</p>
-              <Button onClick={() => navigate('/brinquedos')}>Acessar Acervo</Button>
+              <Button onClick={() => navigate('/brinquedotecas')}>Acessar Acervo</Button>
             </Card>
           </div>
         )}
@@ -101,7 +83,7 @@ export function Dashboard() {
               </div>
               <h2>Ver Brinquedotecas</h2>
               <p>Explore as brinquedotecas de Palmas, veja especificações completas, fotos reais, rotas e avaliações.</p>
-              <Button onClick={() => navigate('/brinquedos', { state: { activeTab: 'explore' } })}>Acessar Mapa</Button>
+              <Button onClick={() => navigate('/brinquedotecas', { state: { activeTab: 'explore' } })}>Acessar Mapa</Button>
             </Card>
 
             <Card className="action-card" hoverable>
@@ -110,7 +92,7 @@ export function Dashboard() {
               </div>
               <h2>Indicar Novo Espaço</h2>
               <p>Recomende uma nova área de lazer pública, praça infantil ou parquinho para transformarmos em brinquedoteca.</p>
-              <Button onClick={() => navigate('/brinquedos', { state: { activeTab: 'recommend' } })}>Fazer Indicação</Button>
+              <Button onClick={() => navigate('/brinquedotecas', { state: { activeTab: 'recommend' } })}>Fazer Indicação</Button>
             </Card>
           </div>
         )}

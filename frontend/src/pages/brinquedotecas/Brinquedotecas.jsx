@@ -1,25 +1,40 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Card } from '../components/Card';
-import { Button } from '../components/Button';
-import { Input } from '../components/Input';
-import { useToast } from '../components/Toast';
-import { useConfirm } from '../components/ConfirmModal';
+import { Card } from '../../components/Card';
+import { Button } from '../../components/Button';
+import { Input } from '../../components/Input';
+import { useToast } from '../../components/Toast';
+import { useConfirm } from '../../components/ConfirmModal';
+import { ModalIndicacao } from './components/ModalIndicacao';
 import {
-  ArrowLeft, Star, MapPin, SlidersHorizontal, Plus,
+  ArrowLeft, ArrowRight, Star, MapPin, SlidersHorizontal, Plus,
   Sparkles, ShieldCheck, X, Check, Trash, Ban, MessageSquare,
-  LogOut, ChevronDown, Wind, Users, Heart, Upload, Search,
+  DoorOpen, DoorClosed, ChevronDown, Wind, Users, Heart, Upload, Search,
   Inbox
 } from 'lucide-react';
-import './Brinquedos.css';
+import './Brinquedotecas.css';
 
-export function Brinquedos() {
+import { useAuth } from '../../hooks/useAuth';
+import { useAuthenticatedFetch } from '../../hooks/useAuthenticatedFetch';
+
+export function Brinquedotecas() {
+
+  const {
+    user,
+    token,
+    logout,
+    loading: authLoading
+  } = useAuth({
+    required: false
+  });
+  const authFetch = useAuthenticatedFetch();
+
+
+
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useToast();
   const confirm = useConfirm();
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState('');
 
   // Tabs: 'explore' | 'recommendations' | 'admin-indicacoes'
   const [activeTab, setActiveTab] = useState('explore');
@@ -75,54 +90,39 @@ export function Brinquedos() {
   const [filterGratuito, setFilterGratuito] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(true);
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-
-    if (!storedToken || !storedUser) {
-      navigate('/login');
-      return;
-    }
-
-    setToken(storedToken);
-    try {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-
-      if (location.state?.activeTab) {
-        setActiveTab(location.state.activeTab);
-        if (location.state.activeTab === 'recommend') {
-          setIsRecommendModalOpen(true);
-          setActiveTab('explore');
-        }
-      } else {
-        setActiveTab('explore');
-      }
-    } catch (e) {
-      console.error(e);
-      navigate('/login');
-    }
-  }, [navigate, location]);
-
   const fetchData = async () => {
-    if (!token) return;
     setLoading(true);
     setError('');
 
     try {
-      const playroomsRes = await fetch('http://localhost:5000/brinquedotecas');
+      // rota pública
+      const playroomsRes = await fetch('/api/brinquedotecas');
+
       const playroomsData = await playroomsRes.json();
-      if (!playroomsRes.ok) throw new Error(playroomsData.error || 'Erro ao buscar brinquedotecas');
+
+      if (!playroomsRes.ok) {
+        throw new Error(
+          playroomsData.error || 'Erro ao buscar brinquedotecas'
+        );
+      }
+
       setBrinquedotecas(playroomsData.data || []);
 
-      const reqHeaders = { 'Authorization': `Bearer ${token}` };
-      const indicacoesRes = await fetch('http://localhost:5000/indicacoes', { headers: reqHeaders });
-      if (indicacoesRes.status !== 401 && indicacoesRes.status !== 403) {
-        const indicacoesData = await indicacoesRes.json();
-        if (indicacoesRes.ok) {
-          setIndicacoes(indicacoesData.data || []);
+      if (token) {
+        const indicacoesRes = await authFetch('/api/indicacoes');
+
+        if (
+          indicacoesRes.status !== 401 &&
+          indicacoesRes.status !== 403
+        ) {
+          const indicacoesData = await indicacoesRes.json();
+
+          if (indicacoesRes.ok) {
+            setIndicacoes(indicacoesData.data || []);
+          }
         }
       }
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -131,23 +131,17 @@ export function Brinquedos() {
   };
 
   useEffect(() => {
-    if (token) {
-      fetchData();
-    }
+    fetchData();
   }, [token]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
+
 
   // Update featured photo when a playroom is selected
   useEffect(() => {
     if (selectedBrinquedoteca) {
       const principal = selectedBrinquedoteca.indicacao?.fotografias?.find(f => f.is_principal)
         || selectedBrinquedoteca.indicacao?.fotografias?.[0];
-      setFeaturedPhotoUrl(principal ? `http://localhost:5000/${principal.caminho}` : '/placeholder-brinquedoteca.jpg');
+      setFeaturedPhotoUrl(principal ? `/api/${principal.caminho}` : '/placeholder-brinquedoteca.jpg');
     }
   }, [selectedBrinquedoteca]);
 
@@ -159,10 +153,9 @@ export function Brinquedos() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/brinquedotecas/${selectedBrinquedoteca.id}/inativar`, {
+      const response = await authFetch(`/api/brinquedotecas/${selectedBrinquedoteca.id}/inativar`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ observacao: inactivateReason })
@@ -189,10 +182,9 @@ export function Brinquedos() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/brinquedotecas/${selectedBrinquedoteca.id}/avaliar`, {
+      const response = await authFetch(`/api/brinquedotecas/${selectedBrinquedoteca.id}/avaliar`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -225,10 +217,12 @@ export function Brinquedos() {
     if (!ok) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/indicacoes/${id}/aprovar`, {
-        method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await authFetch(
+        `/api/indicacoes/${id}/aprovar`,
+        {
+          method: 'PATCH'
+        }
+      );
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Erro ao aprovar indicação');
@@ -252,9 +246,8 @@ export function Brinquedos() {
     if (!ok) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/indicacoes/${id}/rejeitar`, {
+      const response = await authFetch(`/api/indicacoes/${id}/rejeitar`, {
         method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}` }
       });
 
       const data = await response.json();
@@ -279,9 +272,8 @@ export function Brinquedos() {
     if (!ok) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/indicacoes/${id}/cancelar`, {
+      const response = await authFetch(`/api/indicacoes/${id}/cancelar`, {
         method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}` }
       });
 
       const data = await response.json();
@@ -318,9 +310,8 @@ export function Brinquedos() {
     formData.append('foto_principal', recommendPhoto);
 
     try {
-      const response = await fetch('http://localhost:5000/indicacoes', {
+      const response = await authFetch(`/api/indicacoes`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
         body: formData
       });
 
@@ -372,7 +363,7 @@ export function Brinquedos() {
   // Filter playrooms
   const filteredBrinquedotecas = brinquedotecas.filter(b => {
     const nameMatch = b.indicacao?.nome?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      b.indicacao?.endereco?.bairro?.toLowerCase().includes(searchQuery.toLowerCase());
+      b.indicacao?.endereco?.bairro?.toLowerCase().includes(searchQuery.toLowerCase());
     const statusMatch = user?.perfil === 'ADMIN' ? true : b.status === 'ATIVA';
     const sizeMatch = filterSize === 'ALL' || b.indicacao?.porte === filterSize;
     const climatizadoMatch = !filterClimatizado || b.indicacao?.tem_climatizacao;
@@ -393,56 +384,77 @@ export function Brinquedos() {
 
       {/* Header */}
       <header className="page-header">
-        {user?.perfil === 'ADMIN' ? (
-          <Button variant="secondary" onClick={() => navigate('/dashboard')} className="back-btn">
-            <ArrowLeft size={16} /> Voltar
-          </Button>
-        ) : (
-          <Button variant="secondary" onClick={handleLogout} className="logout-btn">
-            <LogOut size={16} /> Sair
-          </Button>
-        )}
         <div className="page-brand">
           <img src="/logo.png" alt="TO Brincando" className="page-logo" />
-          <h1>Central TO Brincando</h1>
+          <h1>TO Brincando</h1>
         </div>
-        {user?.perfil === 'CIDADAO' && (
-          <Button className="add-btn" onClick={() => setIsRecommendModalOpen(true)}>
-            <Plus size={16} /> Indicar Espaço
-          </Button>
-        )}
+
         {user?.perfil === 'ADMIN' && <div style={{ width: '120px' }} />}
+
+        {!user ? (<Button variant="secondary" onClick={() => navigate('/login')} className="back-btn">
+          <DoorOpen size={16} /> Entrar
+        </Button>) : (<Button variant="secondary" onClick={logout} className="back-btn">
+          <DoorClosed size={16} /> Sair
+        </Button>)}
+
+
       </header>
 
       {/* Main Tabs */}
       <div className="tabs-container">
-        <button
-          className={`tab-item ${activeTab === 'explore' ? 'active' : ''}`}
-          onClick={() => setActiveTab('explore')}
-        >
-          Explorar Brinquedotecas
-        </button>
-
-        {user?.perfil === 'CIDADAO' && (
+        <div className="tabs-left">
           <button
-            className={`tab-item ${activeTab === 'recommendations' ? 'active' : ''}`}
-            onClick={() => setActiveTab('recommendations')}
+            className={`tab-item ${activeTab === 'explore' ? 'active' : ''}`}
+            onClick={() => setActiveTab('explore')}
           >
-            Minhas Indicações
+            Explorar Brinquedotecas
           </button>
-        )}
 
-        {user?.perfil === 'ADMIN' && (
-          <button
-            className={`tab-item ${activeTab === 'admin-indicacoes' ? 'active' : ''}`}
-            onClick={() => setActiveTab('admin-indicacoes')}
-          >
-            Gerenciar Recomendações
-          </button>
-        )}
+          {user?.perfil === 'CIDADAO' && (
+            <button
+              className={`tab-item ${activeTab === 'recommendations' ? 'active' : ''}`}
+              onClick={() => setActiveTab('recommendations')}
+            >
+              Minhas Indicações
+            </button>
+          )}
+
+          {user?.perfil === 'ADMIN' && (
+            <button
+              className={`tab-item ${activeTab === 'admin-indicacoes' ? 'active' : ''}`}
+              onClick={() => setActiveTab('admin-indicacoes')}
+            >
+              Gerenciar Recomendações
+            </button>
+          )}
+        </div>
+        <div className="tabs-right" style={{ marginLeft: 'auto' }}>
+          {user && user?.perfil === 'ADMIN' && (
+            <Button variant="secondary" onClick={() => navigate('/usuarios')} className="back-btn" style={{ marginTop: '10px', marginLeft: '5px' }}>
+              <Users size={16} /> Gerenciar Usuários
+            </Button>
+          )}
+
+          {user && (<Button variant="secondary" onClick={() => setIsRecommendModalOpen(true)} className="back-btn" style={{ marginTop: '10px', marginLeft: '5px' }}>
+            <Plus size={16} /> Indicar Espaço
+          </Button>)}
+        </div>
+
       </div>
 
       <main className="brinquedos-main">
+        {/* Welcome Banner */}
+        <section className="welcome-banner" style={{ marginBottom: '24px' }}>
+          <div className="welcome-content">
+            <h2>{user ? `Bem-vindo, ${user.nome?.split(' ')[0]}!` : 'Bem-vindo!'}</h2>
+            <p>
+              {user?.perfil === 'ADMIN'
+                ? 'Acompanhe as indicações da comunidade, aprove novas brinquedotecas e mantenha as informações dos espaços sempre atualizadas.'
+                : 'Descubra espaços de lazer para crianças em Palmas, compartilhe avaliações e contribua indicando novos locais para a comunidade.'}
+            </p>
+          </div>
+        </section>
+
         {error && <div className="error-message">{error}</div>}
 
         {loading ? (
@@ -536,7 +548,7 @@ export function Brinquedos() {
                       const rating = getAverageRating(b);
                       const principalPhoto = b.indicacao?.fotografias?.find(f => f.is_principal) || b.indicacao?.fotografias?.[0];
                       const photoUrl = principalPhoto
-                        ? `http://localhost:5000/${principalPhoto.caminho}`
+                        ? `/api/${principalPhoto.caminho}`
                         : '/placeholder-brinquedoteca.jpg';
 
                       return (
@@ -586,9 +598,6 @@ export function Brinquedos() {
               <div className="explore-section">
                 <div className="section-title-row">
                   <h2>Minhas Indicações de Espaços</h2>
-                  <Button className="add-btn" onClick={() => setIsRecommendModalOpen(true)}>
-                    <Plus size={16} /> Sugerir Novo Local
-                  </Button>
                 </div>
 
                 {indicacoes.length === 0 ? (
@@ -603,7 +612,7 @@ export function Brinquedos() {
                     {indicacoes.map(ind => {
                       const principalPhoto = ind.fotografias?.find(f => f.is_principal) || ind.fotografias?.[0];
                       const photoUrl = principalPhoto
-                        ? `http://localhost:5000/${principalPhoto.caminho}`
+                        ? `/api/${principalPhoto.caminho}`
                         : '/placeholder-brinquedoteca.jpg';
 
                       return (
@@ -658,7 +667,7 @@ export function Brinquedos() {
                     {indicacoes.map(ind => {
                       const principalPhoto = ind.fotografias?.find(f => f.is_principal) || ind.fotografias?.[0];
                       const photoUrl = principalPhoto
-                        ? `http://localhost:5000/${principalPhoto.caminho}`
+                        ? `/api/${principalPhoto.caminho}`
                         : '/placeholder-brinquedoteca.jpg';
 
                       return (
@@ -736,7 +745,7 @@ export function Brinquedos() {
                 {selectedBrinquedoteca.indicacao?.fotografias?.length > 1 && (
                   <div className="modal-gallery">
                     {selectedBrinquedoteca.indicacao.fotografias.map(photo => {
-                      const thumbUrl = `http://localhost:5000/${photo.caminho}`;
+                      const thumbUrl = `/api/${photo.caminho}`;
                       return (
                         <img
                           key={photo.id}
@@ -928,7 +937,7 @@ export function Brinquedos() {
               <div className="modal-body-left">
                 {(() => {
                   const principal = selectedIndicacao.fotografias?.find(f => f.is_principal) || selectedIndicacao.fotografias?.[0];
-                  const photoUrl = principal ? `http://localhost:5000/${principal.caminho}` : '/placeholder-brinquedoteca.jpg';
+                  const photoUrl = principal ? `/api/${principal.caminho}` : '/placeholder-brinquedoteca.jpg';
                   return <img src={photoUrl} alt="Foto Principal" className="modal-featured-image" />;
                 })()}
 
@@ -953,7 +962,7 @@ export function Brinquedos() {
                       {selectedIndicacao.fotografias.map(photo => (
                         <img
                           key={photo.id}
-                          src={`http://localhost:5000/${photo.caminho}`}
+                          src={`/api/${photo.caminho}`}
                           alt="Foto"
                           className="modal-gallery-thumb"
                         />
@@ -1029,154 +1038,15 @@ export function Brinquedos() {
 
       {/* ======================== MODAL: SUBMIT NEW RECOMMENDATION ======================== */}
       {isRecommendModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsRecommendModalOpen(false)}>
-          <Card className="modal-content glass" onClick={e => e.stopPropagation()} style={{ maxWidth: '860px' }}>
-            <div className="modal-header">
-              <h2>Indicar Novo Espaço de Lazer</h2>
-              <button className="close-btn" onClick={() => setIsRecommendModalOpen(false)}><X size={20} /></button>
-            </div>
-
-            <form onSubmit={handleRecommendSubmit} className="recommend-form">
-              <div className="form-sections-grid">
-                {/* Section A: Info */}
-                <div className="form-column">
-                  <h3>Informações do Local</h3>
-
-                  <Input
-                    label="Nome Sugerido do Espaço"
-                    placeholder="Ex: Brinquedoteca do Parque Cesamar"
-                    value={recommendData.nome}
-                    onChange={e => setRecommendData({ ...recommendData, nome: e.target.value })}
-                    required
-                  />
-
-                  <div className="input-group">
-                    <label>Breve Descrição do Local</label>
-                    <textarea
-                      className="form-textarea"
-                      placeholder="Descreva a estrutura, brinquedos disponíveis, o que precisa de melhoria..."
-                      value={recommendData.descricao}
-                      onChange={e => setRecommendData({ ...recommendData, descricao: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div className="input-group">
-                    <label>Porte Sugerido</label>
-                    <select value={recommendData.porte} onChange={e => setRecommendData({ ...recommendData, porte: e.target.value })}>
-                      <option value="PEQUENO">Pequeno (Até 50m²)</option>
-                      <option value="MEDIO">Médio (50m² a 150m²)</option>
-                      <option value="GRANDE">Grande (Mais de 150m²)</option>
-                    </select>
-                  </div>
-
-                  <div className="form-checkboxes">
-                    <h4>Características Disponíveis</h4>
-                    <label className="checkbox-label">
-                      <input type="checkbox" checked={recommendData.tem_climatizacao}
-                        onChange={e => setRecommendData({ ...recommendData, tem_climatizacao: e.target.checked })} />
-                      O espaço é climatizado (Ar condicionado)
-                    </label>
-                    <label className="checkbox-label">
-                      <input type="checkbox" checked={recommendData.tem_monitores}
-                        onChange={e => setRecommendData({ ...recommendData, tem_monitores: e.target.checked })} />
-                      O espaço possui monitores para supervisionar as crianças
-                    </label>
-                    <label className="checkbox-label">
-                      <input type="checkbox" checked={recommendData.tem_gratuidade}
-                        onChange={e => setRecommendData({ ...recommendData, tem_gratuidade: e.target.checked })} />
-                      O acesso é 100% público e gratuito
-                    </label>
-                  </div>
-                </div>
-
-                {/* Section B: Address & Photo */}
-                <div className="form-column">
-                  <h3>Localização e Evidência</h3>
-
-                  <Input
-                    label="CEP (Apenas 8 números)"
-                    placeholder="77000000"
-                    maxLength={8}
-                    value={recommendData.endereco.cep}
-                    onChange={e => setRecommendData({
-                      ...recommendData,
-                      endereco: { ...recommendData.endereco, cep: e.target.value }
-                    })}
-                    required
-                  />
-
-                  <Input
-                    label="Logradouro / Avenida"
-                    placeholder="Ex: Av. NS 2, Quadra 102 Sul"
-                    value={recommendData.endereco.logradouro}
-                    onChange={e => setRecommendData({
-                      ...recommendData,
-                      endereco: { ...recommendData.endereco, logradouro: e.target.value }
-                    })}
-                    required
-                  />
-
-                  <div className="form-row-2">
-                    <Input
-                      label="Número (opcional)"
-                      placeholder="S/N ou Lote 4"
-                      value={recommendData.endereco.numero}
-                      onChange={e => setRecommendData({
-                        ...recommendData,
-                        endereco: { ...recommendData.endereco, numero: e.target.value }
-                      })}
-                    />
-                    <Input
-                      label="Bairro"
-                      placeholder="Plano Diretor Sul"
-                      value={recommendData.endereco.bairro}
-                      onChange={e => setRecommendData({
-                        ...recommendData,
-                        endereco: { ...recommendData.endereco, bairro: e.target.value }
-                      })}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-row-2">
-                    <Input label="Cidade" value={recommendData.endereco.cidade} disabled />
-                    <Input label="Estado (UF)" value={recommendData.endereco.estado} disabled />
-                  </div>
-
-                  {/* Custom Dashed Upload Zone */}
-                  <div>
-                    <label style={{ fontFamily: 'var(--font-headings)', fontSize: '14px', fontWeight: '700', color: 'var(--on-surface-variant)', display: 'block', marginBottom: '8px' }}>
-                      Fotografia Principal do Local *
-                    </label>
-                    <div className={`upload-zone ${recommendPhoto ? 'has-file' : ''}`}>
-                      <input type="file" accept="image/*" onChange={handlePhotoChange} required={!recommendPhoto} />
-                      <div className="upload-zone-icon">
-                        {recommendPhoto ? <Check size={36} /> : <Upload size={36} />}
-                      </div>
-                      <span className="upload-zone-text">
-                        {recommendPhoto ? recommendPhoto.name : 'Clique ou arraste uma foto aqui'}
-                      </span>
-                      <span className="upload-zone-subtext">
-                        Formatos: .jpg, .png, .webp
-                      </span>
-                      {recommendPhotoPreview && (
-                        <img src={recommendPhotoPreview} alt="Preview" className="upload-preview" />
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal-actions">
-                <Button variant="secondary" type="button" onClick={() => setIsRecommendModalOpen(false)}>Cancelar</Button>
-                <Button type="submit">
-                  <Sparkles size={16} /> Enviar Indicação
-                </Button>
-              </div>
-            </form>
-          </Card>
-        </div>
+        <ModalIndicacao
+          recommendData={recommendData}
+          setIsRecommendModalOpen={setIsRecommendModalOpen}
+          handleRecommendSubmit={handleRecommendSubmit}
+          setRecommendData={setRecommendData}
+          recommendPhotoPreview={recommendPhotoPreview}
+          recommendPhoto={recommendPhoto}
+          handlePhotoChange={handlePhotoChange}
+        />
       )}
     </div>
   );
