@@ -5,8 +5,10 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { useToast } from '../components/Toast';
 import { useConfirm } from '../components/ConfirmModal';
-import { ArrowLeft, UserPlus, Edit2, Trash2, X, ShieldCheck, User } from 'lucide-react';
 import './Usuarios.css';
+import { useAuthenticatedFetch } from '../hooks/useAuthenticatedFetch';
+import { useAuth } from '../hooks/useAuth';
+import { SlidersHorizontal, ChevronDown , Search, ArrowLeft, UserPlus, Edit2, Trash2, X, ShieldCheck, User, DoorOpen, DoorClosed, Plus, BarChart3 } from 'lucide-react';
 
 export function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
@@ -21,6 +23,22 @@ export function Usuarios() {
   const [editingUser, setEditingUser] = useState(null);
   const [formData, setFormData] = useState({ nome: '', email: '', senha: '', perfil: 'CIDADAO' });
 
+  const [filtersOpen, setFiltersOpen] = useState(true);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterPerfil, setFilterPerfil] = useState('ALL');
+  const [filterStatus, setFilterStatus] = useState('ATIVO');
+
+  const {
+    user,
+    token,
+    logout,
+    loading: authLoading
+  } = useAuth({
+    required: false
+  });
+  const authFetch = useAuthenticatedFetch();
+
   // Get initials for avatars
   const getInitials = (name) => {
     if (!name) return '?';
@@ -28,30 +46,28 @@ export function Usuarios() {
   };
 
   const fetchUsuarios = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/brinquedotecas');
-        return;
+    if (token) {
+      console.log("Token: ", token);
+      try {
+        const response = await authFetch('/api/usuarios', {
+          method: 'GET'
+        });
+
+        const data = await response.json();
+        console.log("USUARIOS: ", data.data);
+        if (!response.ok) throw new Error(data.error || 'Erro ao carregar usuários');
+        setUsuarios(data.data || []);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
       }
-
-      const response = await fetch('/api/usuarios', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Erro ao carregar usuários');
-      setUsuarios(data.data || []);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchUsuarios();
-  }, [navigate]);
+  }, [user]);
 
   const handleDelete = async (id, nome) => {
     const ok = await confirm({
@@ -64,10 +80,8 @@ export function Usuarios() {
     if (!ok) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/usuarios/${id}`, {
+      const response = await authFetch(`/api/usuarios/${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (!response.ok) {
@@ -75,7 +89,7 @@ export function Usuarios() {
         throw new Error(data.error || 'Erro ao deletar usuário');
       }
 
-      setUsuarios(usuarios.filter(u => u.id !== id));
+      fetchUsuarios();
       showToast(`Usuário "${nome}" excluído com sucesso.`, 'success');
     } catch (err) {
       showToast(err.message, 'error');
@@ -85,7 +99,7 @@ export function Usuarios() {
   const openModal = (user = null) => {
     setEditingUser(user);
     if (user) {
-      setFormData({ nome: user.nome, email: user.email, senha: '', perfil: user.perfil || 'CIDADAO' });
+      setFormData({ nome: user.nome, email: user.email, senha: '', perfil: user.perfil || 'CIDADAO', status: user.status, data_inativacao: user.data_inativacao });
     } else {
       setFormData({ nome: '', email: '', senha: '', perfil: 'CIDADAO' });
     }
@@ -100,7 +114,6 @@ export function Usuarios() {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
       const url = editingUser
         ? `/api/usuarios/${editingUser.id}`
         : '/api/usuarios';
@@ -122,10 +135,9 @@ export function Usuarios() {
         payload.confirmacao_senha = formData.senha;
       }
 
-      const response = await fetch(url, {
+      const response = await authFetch(url, {
         method,
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
@@ -145,6 +157,24 @@ export function Usuarios() {
     }
   };
 
+  const usuariosFiltrados = usuarios.filter(usuario => {
+
+    const busca =
+      usuario.nome?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      usuario.email?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const perfil =
+      filterPerfil === 'ALL' ||
+      usuario.perfil === filterPerfil;
+
+    const status =
+      filterStatus === 'ALL' ||
+      (filterStatus === 'ATIVO' && usuario.status) ||
+      (filterStatus === 'INATIVO' && !usuario.status);
+
+    return busca && perfil && status;
+  });
+
   return (
     <div className="usuarios-container">
       {/* Background Blobs */}
@@ -154,17 +184,117 @@ export function Usuarios() {
       </div>
 
       <header className="usuarios-header">
-        <Button variant="secondary" onClick={() => navigate('/dashboard')} className="back-btn">
-          <ArrowLeft size={16} /> Voltar
-        </Button>
-        <h1>Gerenciar Usuários</h1>
-        <Button className="add-btn" onClick={() => openModal()}>
-          <UserPlus size={16} /> Novo Usuário
-        </Button>
+        <div className="page-brand">
+          <img src="/logo.png" alt="TO Brincando" className="page-logo" />
+          <h1>TO Brincando</h1>
+        </div>
+
+        {!user ? (<Button variant="secondary" onClick={() => navigate('/login')} className="back-btn">
+          <DoorOpen size={16} /> Entrar
+        </Button>) : (<Button variant="secondary" onClick={logout} className="back-btn">
+          <DoorClosed size={16} /> Sair
+        </Button>)}
+
       </header>
+      <div className="tabs-container">
+        <div className="tabs-right" style={{ marginLeft: 'auto' }}>
+          {user && user?.perfil === 'ADMIN' && (
+            <Button variant="secondary" onClick={() => navigate('/dashboard')} className="back-btn" style={{ marginLeft: '5px' }}>
+              <BarChart3 size={16} /> Dashboard
+            </Button>
+          )}
+          {user && user?.perfil === 'ADMIN' && (<Button variant="secondary" onClick={() => openModal()} className="back-btn" style={{ marginLeft: '5px' }}>
+            <UserPlus size={16} /> Novo Usuário
+          </Button>
+          )}
+        </div>
+      </div>
+
 
       <main className="usuarios-main">
         {error && <div className="error-message">{error}</div>}
+
+        <Card className="filters-card">
+
+          <button
+            className="filters-toggle-btn"
+            onClick={() => setFiltersOpen(!filtersOpen)}
+          >
+            <span className="filters-toggle-left">
+              <SlidersHorizontal size={18} />
+              <h3>Buscar e Filtrar Usuários</h3>
+            </span>
+
+            <ChevronDown
+              size={20}
+              className={`filters-chevron ${filtersOpen ? 'open' : ''}`}
+            />
+          </button>
+
+          <div className={`filters-body ${filtersOpen ? 'open' : ''}`}>
+
+            <div className="filters-grid">
+
+              <div className="input-group" style={{ marginBottom: 0 }}>
+                <label>Nome ou E-mail</label>
+
+                <div style={{ position: 'relative' }}>
+                  <input
+                    className="input-field"
+                    placeholder="Digite um nome ou e-mail..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    style={{
+                      paddingLeft: '42px',
+                      width: '100%'
+                    }}
+                  />
+
+                  <Search
+                    size={16}
+                    style={{
+                      position: 'absolute',
+                      left: '14px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: 'var(--on-surface-variant)',
+                      pointerEvents: 'none'
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="filter-group">
+                <label>Perfil</label>
+
+                <select
+                  value={filterPerfil}
+                  onChange={e => setFilterPerfil(e.target.value)}
+                >
+                  <option value="ALL">Todos</option>
+                  <option value="ADMIN">Administrador</option>
+                  <option value="CIDADAO">Cidadão</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Status</label>
+
+                <select
+                  value={filterStatus}
+                  onChange={e => setFilterStatus(e.target.value)}
+                >
+                  <option value="ALL">Todos</option>
+                  <option value="ATIVO">Ativos</option>
+                  <option value="INATIVO">Inativos</option>
+                </select>
+              </div>
+
+            </div>
+
+          </div>
+
+        </Card>
 
         {isLoading ? (
           <div className="loading-state">
@@ -180,36 +310,44 @@ export function Usuarios() {
             </p>
           </div>
         ) : (
-          <div className="usuarios-list">
-            {usuarios.length === 0 ? (
+          <div
+            className="usuarios-list">
+            {usuariosFiltrados.length === 0 ? (
               <div className="empty-state">
                 <p>Nenhum usuário encontrado no sistema.</p>
               </div>
             ) : (
-              usuarios.map(usuario => (
-                <Card key={usuario.id} className="usuario-card">
-                  <div className="usuario-card-left">
-                    <div className={`user-avatar ${usuario.perfil === 'ADMIN' ? 'admin' : 'cidadao'}`}>
-                      {getInitials(usuario.nome)}
+              usuariosFiltrados
+                .map(usuario => (
+                  <Card key={usuario.id} className="usuario-card">
+                    <div className="usuario-card-left">
+                      <div className={`user-avatar ${usuario.perfil === 'ADMIN' ? 'admin' : 'cidadao'}`}>
+                        {getInitials(usuario.nome)}
+                      </div>
+                      <div className="usuario-info">
+                        <h3>{usuario.nome}</h3>
+                        <p>{usuario.email}</p>
+                        <div>
+                          <span className={`role-badge ${usuario.perfil === 'ADMIN' ? 'admin' : 'cidadao'}`} style={{ marginLeft: '5px' }}>
+                            {usuario.perfil === 'ADMIN' ? <><ShieldCheck size={11} /> Administrador</> : <><User size={11} /> Cidadão</>}
+                          </span>
+                          <span className={`role-badge ${usuario.status ? 'success' : 'danger'}`} style={{ marginLeft: '5px' }}>
+                            <ShieldCheck size={11} /> {usuario.status ? "ATIVO" : "INATIVO"}
+                          </span>
+                        </div>
+
+                      </div>
                     </div>
-                    <div className="usuario-info">
-                      <h3>{usuario.nome}</h3>
-                      <p>{usuario.email}</p>
-                      <span className={`role-badge ${usuario.perfil === 'ADMIN' ? 'admin' : 'cidadao'}`}>
-                        {usuario.perfil === 'ADMIN' ? <><ShieldCheck size={11} /> Administrador</> : <><User size={11} /> Cidadão</>}
-                      </span>
+                    <div className="usuario-actions">
+                      <Button variant="secondary" className="edit-btn" onClick={() => openModal(usuario)} title="Editar usuário">
+                        <Edit2 size={16} />
+                      </Button>
+                      <Button variant="secondary" className="delete-btn" onClick={() => handleDelete(usuario.id, usuario.nome)} title="Excluir usuário">
+                        <Trash2 size={16} />
+                      </Button>
                     </div>
-                  </div>
-                  <div className="usuario-actions">
-                    <Button variant="secondary" className="edit-btn" onClick={() => openModal(usuario)} title="Editar usuário">
-                      <Edit2 size={16} />
-                    </Button>
-                    <Button variant="secondary" className="delete-btn" onClick={() => handleDelete(usuario.id, usuario.nome)} title="Excluir usuário">
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
-                </Card>
-              ))
+                  </Card>
+                ))
             )}
           </div>
         )}
