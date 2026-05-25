@@ -10,7 +10,7 @@ import {
   ArrowLeft, ArrowRight, Star, MapPin, SlidersHorizontal, Plus,
   Sparkles, ShieldCheck, X, Check, Trash, Ban, MessageSquare,
   DoorOpen, DoorClosed, ChevronDown, Wind, Users, Heart, Upload, Search,
-  Inbox
+  Inbox, BarChart3 
 } from 'lucide-react';
 import './Brinquedotecas.css';
 
@@ -389,15 +389,11 @@ export function Brinquedotecas() {
           <h1>TO Brincando</h1>
         </div>
 
-        {user?.perfil === 'ADMIN' && <div style={{ width: '120px' }} />}
-
         {!user ? (<Button variant="secondary" onClick={() => navigate('/login')} className="back-btn">
           <DoorOpen size={16} /> Entrar
         </Button>) : (<Button variant="secondary" onClick={logout} className="back-btn">
           <DoorClosed size={16} /> Sair
         </Button>)}
-
-
       </header>
 
       {/* Main Tabs */}
@@ -430,8 +426,8 @@ export function Brinquedotecas() {
         </div>
         <div className="tabs-right" style={{ marginLeft: 'auto' }}>
           {user && user?.perfil === 'ADMIN' && (
-            <Button variant="secondary" onClick={() => navigate('/usuarios')} className="back-btn" style={{ marginTop: '10px', marginLeft: '5px' }}>
-              <Users size={16} /> Gerenciar Usuários
+            <Button variant="secondary" onClick={() => navigate('/dashboard')} className="back-btn" style={{ marginTop: '10px', marginLeft: '5px' }}>
+              <BarChart3  size={16} /> Dashboard
             </Button>
           )}
 
